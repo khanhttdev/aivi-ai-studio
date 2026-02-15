@@ -1,0 +1,124 @@
+@import "tailwindcss";
+@import "../styles/components.css";
+@import "../styles/animations.css";
+@import "../styles/utilities.css";
+
+/* ===== AIVI Design System - Core Tokens ===== */
+
+:root {
+  /* Backgrounds - Antigravity Deep Dark Theme */
+  --bg-deep: #05070a;
+  --bg-darker: #080c14;
+  --bg-primary: #0a0f1a;
+  --bg-secondary: #0f172a;
+  --bg-tertiary: #1e293b;
+  --bg-gradient-main: radial-gradient(circle at 50% -20%, #1e293b 0%, #05070a 100%);
+
+  /* Accents - Antigravity Neon Palette */
+  --accent-sky: #22d3ee;
+  --accent-rose: #f43f5e;
+  --accent-amber: #f59e0b;
+  --accent-emerald: #10b981;
+  --accent-blue: #3b82f6;
+
+  /* Standard Design Tokens (Technical Premium) */
+  --accent-primary: var(--accent-sky);
+  --accent-secondary: var(--accent-rose);
+  --decorative-start: var(--accent-sky);
+  --decorative-end: var(--accent-rose);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.15);
+  --border-glow: rgba(34, 211, 238, 0.3);
+
+  /* Semantics */
+  --success: var(--accent-emerald);
+  --warning: var(--accent-amber);
+  --error: var(--accent-rose);
+
+  /* Text - High Contrast technical hierarchy */
+  --text-white: #FFFFFF;
+  --text-primary: #FFFFFF;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --text-muted: rgba(255, 255, 255, 0.5);
+
+  /* Glass/Blur - Premium Antigravity Style */
+  --glass-bg: rgba(10, 15, 26, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --blur-sm: blur(8px);
+  --blur-md: blur(16px);
+  --blur-lg: blur(32px);
+  --blur-xl: blur(64px);
+
+  /* Glows - Atmospheric Light */
+  --glow-sky: 0 0 30px rgba(34, 211, 238, 0.2);
+  --glow-rose: 0 0 30px rgba(244, 63, 94, 0.2);
+  --glow-amber: 0 0 30px rgba(245, 158, 11, 0.2);
+  --glow-emerald: 0 0 30px rgba(16, 185, 129, 0.2);
+  --glow-blue: 0 0 40px rgba(59, 130, 246, 0.3);
+
+  /* Gradients - Vibrant Multi-color */
+  --gradient-vibrant: linear-gradient(45deg, #f43f5e, #f59e0b, #10b981, #22d3ee, #8b5cf6);
+  --gradient-cyber: linear-gradient(135deg, var(--accent-sky) 0%, var(--accent-rose) 100%);
+  --gradient-technical: linear-gradient(to right, #fb7185, #f59e0b, #38bdf8);
+  --gradient-dark: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 100%);
+  --gradient-conic: conic-gradient(from 0deg, #f43f5e, #f59e0b, #10b981, #22d3ee, #8b5cf6, #f43f5e);
+}
+
+/* Background global */
+body {
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  min-height: 100vh;
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Layer 1: Background Image */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url('/images/app-background.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.20;
+  pointer-events: none;
+  z-index: -3;
+}
+
+/* Layer 2: Gradient Atmosphere */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% -20%, rgba(34, 211, 238, 0.15), transparent 70%),
+    radial-gradient(circle at 0% 0%, rgba(59, 130, 246, 0.08), transparent 50%),
+    radial-gradient(circle at 100% 100%, rgba(244, 63, 94, 0.08), transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.03), transparent 60%);
+  pointer-events: none;
+  z-index: -2;
+}
+
+/* Layer 3: Subtle Grid Pattern */
+.app-grid-overlay {
+  position: fixed;
+  inset: 0;
+  background-size: 60px 60px;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.5;
+}
+
+@theme inline {
+  --color-background: var(--bg-primary);
+  --color-foreground: var(--text-primary);
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-quicksand: var(--font-quicksand);
+  --color-primary-orange: #F97316;
+}
