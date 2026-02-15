@@ -35,7 +35,7 @@ export async function POST(req: Request) {
 
         // Initialize Gemini API with custom key if provided
         const genAI = new GoogleGenAI({
-            apiKey: apiKey || process.env.NEXT_PUBLIC_GEMINI_API_KEY || ""
+            apiKey: apiKey || process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY || ""
         });
 
         // Handle chat messages (original Mei chatbot functionality)

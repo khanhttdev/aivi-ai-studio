@@ -7,7 +7,7 @@ import { buildProcessingPrompt, buildScenePrompt, buildVideoScenePrompt } from '
 
 // Initialize Google GenAI client
 const getClient = (apiKey?: string) => {
-    const key = apiKey || process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+    const key = apiKey || process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY;
     if (!key) {
         throw new Error('API Key is missing. Please configuration in Profile or .env');
     }
