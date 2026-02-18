@@ -1,93 +1,110 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
-
-// Rate limiting map
-const rateLimit = new Map<string, number>();
+import { checkRateLimit, getClientIp, rateLimitResponse, RATE_LIMITS } from '@/lib/rateLimit';
 
 export async function POST(request: NextRequest) {
-    // Basic Rate Limiting
-    const ip = request.headers.get('x-forwarded-for') || 'unknown';
-    const now = Date.now();
-    if (rateLimit.has(ip) && now - rateLimit.get(ip)! < 5000) { // 5s cooldown for images
-        return NextResponse.json(
-            { error: 'Too many requests. Please wait a moment.' },
-            { status: 429 }
-        );
+    // Rate limiting
+    const clientIp = getClientIp(request);
+    const rateCheck = checkRateLimit(`kol-mini-lulu-cover:${clientIp}`, RATE_LIMITS.kolGeneration);
+    if (!rateCheck.allowed) {
+        return rateLimitResponse(rateCheck);
     }
-    rateLimit.set(ip, now);
 
     try {
         const body = await request.json();
-        const { idea, characterPrompt, apiKey, locale } = body;
+        const { idea, characterPrompt, locale, apiKey } = body;
 
-        const finalApiKey = apiKey || process.env.NEXT_PUBLIC_GEMINI_API_KEY || process.env.GEMINI_API_KEY;
+        const finalApiKey = apiKey || process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY || "";
 
         if (!finalApiKey) {
-            return NextResponse.json(
-                { error: 'API key is missing.' },
-                { status: 401 }
-            );
+            return NextResponse.json({ error: 'API key is missing.' }, { status: 401 });
         }
 
         const genAI = new GoogleGenAI({ apiKey: finalApiKey });
 
-        const isVietnamese = locale === 'vi';
-        const textLanguageInstruction = isVietnamese
-            ? "Ensure any text in the image is in **Vietnamese**."
-            : "Ensure any text in the image is in **English**.";
-
-        const finalPrompt = `
-        Create a 3D Pixar-style movie poster/cover art.
+        // Construct a highly detailed prompt for viral thumbnail
+        const basePrompt = `
+        Create a VIRAL YouTube/TikTok Thumbnail in 3D Pixar/Disney Animation Style.
         
-        Characters:
-        1. **Mini** (Cat): Sassy, cute but grumpy, wears hoodies.
-        2. **Lulu** (Dog): Energetic, happy, wears glasses/scarf.
-        ${characterPrompt ? `Custom Details: ${characterPrompt}` : ''}
+        Characters: 
+        - Mini: A cute grey British Shorthair Cat with amber eyes, chubby, slightly grumpy-cute expression, wearing a red bow tie.
+        - Lulu: A golden Golden Retriever Dog with a big happy smile, tongue out, fluffy, wearing a blue scarf.
         
-        Action/Context from Story Idea:
-        "${idea}"
+        Theme/Story: "${idea || characterPrompt || 'Funny chaotic situation between a cat and a dog'}"
         
-        Style: 3D Animation, Pixar/Disney style, **VIBRANT COLORS**, high saturation, lively atmosphere, high quality, 4k render, cute, expressive lighting.
+        Thumbnail Requirements:
+        - EXTREMELY eye-catching, high contrast colors (orange, yellow, pink, purple)
+        - Characters with EXAGGERATED shocked/surprised/funny expressions
+        - Dynamic composition, characters looking at camera
+        - Bold, clean background (gradient or simple environment)
+        - Studio lighting with rim light for pop effect
+        - NO TEXT on the image
+        - 3D render quality, Pixar/Disney style, 8K resolution
         
-        Text Requirement:
-        - Include a catchy, short title related to the action.
-        - ${textLanguageInstruction}
-        - The text should be bold, colorful, and fun.
-
-        Format: Vertical 9:16 aspect ratio composition.
+        Aspect Ratio: 9:16 (Vertical, portrait for TikTok/Reels).
         `;
 
-        const response = await genAI.models.generateContent({
-            model: "gemini-3-pro-image-preview",
-            contents: [{ role: 'user', parts: [{ text: finalPrompt }] }],
-            config: {
-                responseModalities: ['image']
+        // Try primary model
+        try {
+            const response = await genAI.models.generateContent({
+                model: 'gemini-3-pro-image-preview',
+                contents: [{ role: 'user', parts: [{ text: basePrompt }] }],
+                config: {
+                    responseModalities: ['image'],
+                }
+            });
+
+            const parts = response.candidates?.[0]?.content?.parts;
+            const imagePart = parts?.find((p: any) => p.inlineData);
+
+            if (imagePart?.inlineData) {
+                const base64 = imagePart.inlineData.data;
+                const mimeType = imagePart.inlineData.mimeType || 'image/png';
+                return NextResponse.json({ imageUrl: `data:${mimeType};base64,${base64}` });
             }
-        });
 
-        const parts = response.candidates?.[0]?.content?.parts;
-        if (!parts) throw new Error('No content generated');
+            throw new Error('No image from gemini-3-pro-image-preview');
 
-        let imageBase64 = '';
-        for (const part of parts) {
-            if (part.inlineData?.data) {
-                imageBase64 = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
-                break;
+        } catch (primaryError) {
+            console.warn('gemini-3-pro-image-preview failed, trying gemini-2.0-flash:', primaryError);
+
+            // Try gemini-2.0-flash-preview-image-generation as fallback
+            try {
+                const fallbackResponse = await genAI.models.generateContent({
+                    model: 'gemini-2.0-flash-preview-image-generation',
+                    contents: [{ role: 'user', parts: [{ text: basePrompt }] }],
+                    config: {
+                        responseModalities: ['image', 'text'],
+                    }
+                });
+
+                const parts = fallbackResponse.candidates?.[0]?.content?.parts;
+                const imagePart = parts?.find((p: any) => p.inlineData);
+
+                if (imagePart?.inlineData) {
+                    const base64 = imagePart.inlineData.data;
+                    const mimeType = imagePart.inlineData.mimeType || 'image/png';
+                    return NextResponse.json({ imageUrl: `data:${mimeType};base64,${base64}` });
+                }
+
+                throw new Error('No image from fallback model');
+
+            } catch (fallbackError) {
+                console.warn('Fallback model failed, using Pollinations:', fallbackError);
+
+                // Final fallback: Pollinations.ai
+                const safePrompt = encodeURIComponent(basePrompt.slice(0, 300));
+                const seed = Math.floor(Math.random() * 100000);
+                const imageUrl = `https://image.pollinations.ai/prompt/${safePrompt}?width=576&height=1024&model=flux&seed=${seed}&nologo=true`;
+
+                return NextResponse.json({ imageUrl });
             }
         }
 
-        if (!imageBase64) throw new Error('No image data found in response');
-
-        return NextResponse.json({ imageUrl: imageBase64 });
-
-    } catch (error: any) {
-        console.error('Cover Generation Error:', error);
-        console.error('Error Stack:', error.stack);
+    } catch (error) {
+        console.error('KOL Mini Lulu Cover API Error:', error);
         return NextResponse.json(
-            {
-                error: error.message || 'Failed to generate cover',
-                details: error.toString()
-            },
+            { error: error instanceof Error ? error.message : 'Unknown error' },
             { status: 500 }
         );
     }

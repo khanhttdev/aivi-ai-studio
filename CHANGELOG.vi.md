@@ -2,7 +2,21 @@
 
 Tất cả các thay đổi đáng chú ý đối với dự án Mimi & Lulu sẽ được ghi lại trong tệp này.
 
+## [0.2.0] - 2026-02-18
+
+### ✨ Tính năng mới
+- **Auto-Generate Thumbnails**: Tự động tạo ảnh thumbnail cho dự án nếu chưa có (dựa trên story idea), kèm trạng thái loading trực quan trên Dashboard.
+- **Category Selection**: Tích hợp chọn danh mục vào luồng tạo dự án, thêm Step Progress Bar vào layout, và template theo danh mục ở Bước 1.
+- **KOL Mini-Lulu Dashboard**: Giao diện quản lý dự án mới với lưu trữ đám mây Supabase, hỗ trợ đa ngôn ngữ (VI/EN).
+
+### 🐛 Vá lỗi & Cải thiện
+- **Sửa lỗi `auto-release.js`**: Khắc phục `TypeError: Assignment to constant variable` (đổi `const` thành `let`).
+- **Đồng bộ Stats**: Cập nhật số liệu chính xác (11 Skills, 23 Agents, 22 Workflows, 12 Rules) vào README.
+
+---
+
 ## [1.1.0] - 2026-02-16
+
 
 ### ✨ Tính năng mới (Mimi & Lulu)
 - **Dashboard Dự án**: Giao diện mới chuyên nghiệp để quản lý tất cả các dự án Mimi & Lulu.

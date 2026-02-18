@@ -65,7 +65,7 @@ function main() {
 
     // --- A. Cập nhật Version ---
     console.log("1️⃣  Updating Version Numbers...");
-    const updatedFiles = []; // eslint-disable-line @typescript-eslint/no-unused-vars
+    let updatedFiles = 0;
 
     VERSION_FILES.forEach(config => {
         const filePath = path.join(process.cwd(), config.path);

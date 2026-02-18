@@ -210,7 +210,7 @@ export function MeiAssistant() {
                             aria-expanded={isOpen}
                             className="w-14 h-14 rounded-full bg-gradient-to-tr from-pink-500 to-yellow-500 shadow-[0_4px_20px_rgba(236,72,153,0.4)] flex items-center justify-center text-white relative group"
                         >
-                            <div className="w-full h-full rounded-full overflow-hidden border-2 border-white/20">
+                            <div className="w-full h-full rounded-full overflow-hidden border-2 border-white/20 relative">
                                 <Image
                                     src="/mei-avatar.png"
                                     alt="Chat with Mei"

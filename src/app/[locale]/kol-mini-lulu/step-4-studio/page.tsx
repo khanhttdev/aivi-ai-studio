@@ -51,24 +51,32 @@ export default function Step4StudioPage() {
         }
     };
 
-    const handleGenerateVideo = (sceneId: string) => {
+    const handleGenerateVideo = async (sceneId: string) => {
         const scene = script.find(s => s.id === sceneId);
-        if (!scene) return;
+        if (!scene || !scene.image_url) return;
 
         setLoadingState(prev => ({ ...prev, [sceneId]: 'video' }));
 
-        // Generate Motion Prompt (Text for now)
-        // Formula: <Camera> + <Action> + <Quality>
-        const motionPrompt = `Subject: ${scene.character === 'both' ? 'Cat and Dog' : (scene.character === 'mini' ? 'Cat' : 'Dog')}. Action: ${scene.action}. Camera: Slow motion, cinematic tracking shot. Atmosphere: Cute 3D animation style.`;
-
-        // Simulate API delay for Ux
-        setTimeout(() => {
-            updateScene(sceneId, {
-                video_url: 'placeholder_for_motion_prompt', // Using this field to indicate "generated"
-                visual_prompt: motionPrompt // Storing the actual prompt here
+        try {
+            const response = await fetch('/api/kol-mini-lulu/generate-video', {
+                method: 'POST',
+                body: JSON.stringify({
+                    prompt: scene.visual_prompt || scene.action,
+                    imageUrl: scene.image_url
+                })
             });
+            const data = await response.json();
+
+            if (data.result) {
+                updateScene(sceneId, { video_url: data.result });
+            } else {
+                console.error("No video result", data);
+            }
+        } catch (error) {
+            console.error("Video generation failed:", error);
+        } finally {
             setLoadingState(prev => ({ ...prev, [sceneId]: null }));
-        }, 1000);
+        }
     };
 
     const handleNext = () => {

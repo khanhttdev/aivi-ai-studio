@@ -46,6 +46,7 @@ Return ONLY valid JSON matching this schema:
     "character": "mini" | "lulu" | "both",
     "action": "Visual description of the action for 3D generation",
     "dialogue": "Short dialogue in Vietnamese (Tiếng Việt)",
+    "visual_prompt": "Detailed prompt for image generation. Style: 3D Pixar Animation, Cute, Bright Lighting. Describe the character's pose, expression, and environment in English.",
     "duration": 5
   }
 ]

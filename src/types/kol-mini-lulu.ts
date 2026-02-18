@@ -41,6 +41,7 @@ export interface MiniLuluState {
     currentStep: number;
 
     // Concept (Step 1)
+    selectedCategory: string | null;
     selectedTemplateId: string | null;
     customPrompt: string;
     isCustom: boolean;
@@ -67,6 +68,7 @@ export interface MiniLuluState {
 
     // Actions
     setCurrentStep: (step: number) => void;
+    setSelectedCategory: (cat: string | null) => void;
     setTemplate: (id: string | null) => void;
     setCustomPrompt: (prompt: string) => void;
     setCustomCharacter: (char: { name: string; prompt: string } | null) => void;
@@ -79,6 +81,8 @@ export interface MiniLuluState {
     setIsGeneratingIdea: (loading: boolean) => void;
     setSeoData: (data: SeoData | null) => void;
     updateScene: (id: string, updates: Partial<Scene>) => void;
+    setGeneratedImage: (sceneId: string, url: string) => void;
+    setGeneratedVideo: (sceneId: string, url: string) => void;
     reset: () => void;
 
     // Project Management Actions
@@ -92,6 +96,7 @@ export const extractLuluStateForPersistence = (state: MiniLuluState): Partial<Mi
     const {
         projectId,
         currentStep,
+        selectedCategory,
         selectedTemplateId,
         customPrompt,
         isCustom,
@@ -108,6 +113,7 @@ export const extractLuluStateForPersistence = (state: MiniLuluState): Partial<Mi
     return {
         projectId,
         currentStep,
+        selectedCategory,
         selectedTemplateId,
         customPrompt,
         isCustom,

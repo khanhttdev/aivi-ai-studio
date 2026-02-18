@@ -13,10 +13,11 @@ export const useKolMiniLuluStore = create<MiniLuluState>()(
             isLoadingProjects: false as boolean,
             isSaving: false as boolean,
             currentStep: 1,
+            selectedCategory: null as string | null,
             selectedTemplateId: null as string | null,
             customPrompt: '',
             isCustom: false as boolean,
-            selectedCharacter: null as CharacterId | null,
+            selectedCharacter: 'both' as CharacterId | null,
             customCharacter: null as { name: string; prompt: string } | null,
             miniConfig: { prompt: '' as string, image: null as string | null },
             luluConfig: { prompt: '' as string, image: null as string | null },
@@ -31,6 +32,8 @@ export const useKolMiniLuluStore = create<MiniLuluState>()(
 
             // Actions
             setCurrentStep: (step: number) => set({ currentStep: step }),
+
+            setSelectedCategory: (cat: string | null) => set({ selectedCategory: cat }),
 
             setTemplate: (id: string | null) => set({
                 selectedTemplateId: id,
@@ -64,13 +67,22 @@ export const useKolMiniLuluStore = create<MiniLuluState>()(
                 script: state.script.map((s: any) => s.id === id ? { ...s, ...updates } : s)
             })),
 
+            setGeneratedImage: (sceneId: string, url: string) => set((state: any) => ({
+                script: state.script.map((s: any) => s.id === sceneId ? { ...s, image_url: url } : s)
+            })),
+
+            setGeneratedVideo: (sceneId: string, url: string) => set((state: any) => ({
+                script: state.script.map((s: any) => s.id === sceneId ? { ...s, video_url: url } : s)
+            })),
+
             reset: () => set({
                 projectId: null,
                 currentStep: 1,
+                selectedCategory: null,
                 selectedTemplateId: null,
                 customPrompt: '',
                 isCustom: false,
-                selectedCharacter: null,
+                selectedCharacter: 'both',
                 customCharacter: null,
                 miniConfig: { prompt: '', image: null },
                 luluConfig: { prompt: '', image: null },

@@ -79,6 +79,7 @@ export default function Step3ScriptPage() {
             character: 'mini',
             action: '',
             dialogue: '',
+            visual_prompt: '',
             duration: 5
         };
         setScript([...script, newScene]);
@@ -190,6 +191,20 @@ export default function Step3ScriptPage() {
                                         placeholder="Nhập lời thoại..."
                                     />
                                 </div>
+                            </div>
+
+                            {/* Visual Prompt */}
+                            <div className="mt-4">
+                                <label className="text-xs font-medium text-[var(--text-secondary)] uppercase mb-1 flex items-center gap-2">
+                                    <Wand2 className="w-3 h-3 text-purple-500" />
+                                    {t('visual_prompt_label')}
+                                </label>
+                                <textarea
+                                    value={scene.visual_prompt || ''}
+                                    onChange={(e) => updateScene(scene.id, { visual_prompt: e.target.value })}
+                                    className="w-full bg-[var(--bg-secondary)] border border-[var(--border)] rounded-lg p-3 text-sm focus:ring-2 focus:ring-purple-500/50 outline-none resize-none h-24 font-mono text-gray-400"
+                                    placeholder={t('visual_prompt_placeholder')}
+                                />
                             </div>
                         </div>
 
