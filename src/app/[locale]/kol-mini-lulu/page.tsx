@@ -443,7 +443,7 @@ export default function KolMiniLuluDashboard() {
                                                                     <div className="w-10 h-10 rounded-full border-2 border-amber-500/30 border-t-amber-500 animate-spin" />
                                                                     <Sparkles className="absolute inset-0 m-auto w-4 h-4 text-amber-400" />
                                                                 </div>
-                                                                <p className="text-[9px] text-amber-400/60 font-medium">Đang tạo ảnh...</p>
+                                                                <p className="text-[9px] text-amber-400/60 font-medium">{t('generating_thumbnail')}</p>
                                                             </div>
                                                         );
                                                     }
@@ -489,6 +489,7 @@ export default function KolMiniLuluDashboard() {
                                                             setDeleteId(project.id);
                                                         }}
                                                         className="p-2 -mr-2 text-[var(--text-muted)] hover:text-red-500 transition-colors"
+                                                        aria-label={t('btn_delete')}
                                                     >
                                                         <Trash2 size={16} />
                                                     </button>

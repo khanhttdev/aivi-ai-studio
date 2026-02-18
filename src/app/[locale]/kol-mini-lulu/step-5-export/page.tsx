@@ -86,7 +86,7 @@ export default function Step5MarketingKitPage() {
 
     const handleNewProject = () => {
         reset();
-        router.push('/kol-mini-lulu/step-1-concept');
+        router.push(`/${locale}/kol-mini-lulu/step-1-concept`);
     };
 
     const generateSEO = async () => {

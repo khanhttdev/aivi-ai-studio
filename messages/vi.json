@@ -785,6 +785,12 @@
             "both": "Cả Hai",
             "btn_continue": "Tiếp tục",
             "generating_outfit": "ĐANG TẠO TRANG PHỤC...",
+            "generating_outfit_detail": "AI đang tạo hình {char}",
+            "no_image": "Chưa có ảnh",
+            "loading_text": "Đang tạo...",
+            "regenerate": "Tạo lại",
+            "download_image": "Tải ảnh",
+            "story_label": "Cốt truyện",
             "prompt_placeholder_mini": "Thay đổi trang phục cho Mini...",
             "prompt_placeholder_lulu": "Thay đổi trang phục cho Lulu...",
             "toast_success": "Đã tạo hình {char} thành công!",
@@ -866,7 +872,8 @@
             "load_fail": "Lỗi khi tải dự án",
             "empty_title": "Chưa có dự án nào",
             "empty_subtitle": "Bắt đầu hành trình sáng tạo Mimi & Lulu đầu tiên của bạn ngay!",
-            "btn_create_first": "Tạo dự án đầu tiên"
+            "btn_create_first": "Tạo dự án đầu tiên",
+            "generating_thumbnail": "Đang tạo ảnh..."
         }
     }
 }

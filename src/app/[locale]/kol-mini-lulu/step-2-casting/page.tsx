@@ -47,11 +47,11 @@ export default function Step2CastingPage() {
             if (data.imageUrl) {
                 if (charId === 'mini') setMiniConfig({ image: data.imageUrl });
                 else setLuluConfig({ image: data.imageUrl });
-                toast.success(`✨ ${charId === 'mini' ? 'Mini' : 'Lulu'} đã sẵn sàng!`);
+                toast.success(t('toast_success', { char: charId === 'mini' ? 'Mini' : 'Lulu' }));
             }
         } catch (error) {
             console.error(error);
-            toast.error('Không thể tạo ảnh, thử lại nhé!');
+            toast.error(t('toast_error'));
         } finally {
             setGeneratingState(prev => ({ ...prev, [charId]: false }));
         }
@@ -114,8 +114,8 @@ export default function Step2CastingPage() {
                                     <Sparkles className="w-8 h-8 text-orange-400 animate-pulse" />
                                 </div>
                                 <div className="text-center">
-                                    <p className="text-xs font-semibold text-white">Đang thiết kế trang phục...</p>
-                                    <p className="text-[10px] text-gray-500 mt-1">AI đang tạo hình {isMini ? 'Mini 🐱' : 'Lulu 🐶'}</p>
+                                    <p className="text-xs font-semibold text-white">{t('generating_outfit')}</p>
+                                    <p className="text-[10px] text-gray-500 mt-1">{t('generating_outfit_detail', { char: isMini ? 'Mini 🐱' : 'Lulu 🐶' })}</p>
                                 </div>
                             </m.div>
                         ) : hasImage ? (
@@ -137,7 +137,7 @@ export default function Step2CastingPage() {
                                 className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-gray-600"
                             >
                                 <Sparkles className="w-8 h-8 opacity-30" />
-                                <p className="text-xs">Chưa có ảnh</p>
+                                <p className="text-xs">{t('no_image')}</p>
                             </m.div>
                         )}
                     </AnimatePresence>
@@ -169,12 +169,12 @@ export default function Step2CastingPage() {
                         {isLoading ? (
                             <>
                                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                                <span>Đang tạo...</span>
+                                <span>{t('loading_text')}</span>
                             </>
                         ) : (
                             <>
                                 <RefreshCw className="w-3.5 h-3.5" />
-                                <span>Tạo lại</span>
+                                <span>{t('regenerate')}</span>
                             </>
                         )}
                     </button>
@@ -185,7 +185,8 @@ export default function Step2CastingPage() {
                             href={config.image!}
                             download={`${type}-outfit.png`}
                             className="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-all border border-white/5"
-                            title="Tải ảnh"
+                            title={t('download_image')}
+                            aria-label={t('download_image')}
                         >
                             <Download className="w-4 h-4" />
                         </a>
@@ -234,7 +235,7 @@ export default function Step2CastingPage() {
                 <div className="mb-5 px-1">
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-purple-500/10 border border-purple-500/20 rounded-full">
                         <Sparkles className="w-3 h-3 text-purple-400" />
-                        <span className="text-[11px] text-purple-300 font-medium">Cốt truyện: </span>
+                        <span className="text-[11px] text-purple-300 font-medium">{t('story_label')}: </span>
                         <span className="text-[11px] text-gray-400 truncate max-w-[300px]">{customPrompt}</span>
                     </div>
                 </div>

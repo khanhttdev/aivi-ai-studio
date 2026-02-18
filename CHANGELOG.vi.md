@@ -2,6 +2,16 @@
 
 Tất cả các thay đổi đáng chú ý đối với dự án Mimi & Lulu sẽ được ghi lại trong tệp này.
 
+## [0.2.1] - 2026-02-18
+
+### 🐛 Vá lỗi & Cải thiện (Audit Fixes)
+- **Fix Bug Locale Prefix**: Sửa lỗi `handleNewProject` trong `step-5-export` thiếu `/${locale}` prefix gây lỗi 404 khi nhấn "Dự án mới".
+- **i18n Hoàn thiện**: Thay thế 8 hardcoded strings tiếng Việt trong `step-2-casting` và Dashboard bằng i18n keys chuẩn (hỗ trợ đầy đủ EN/VI).
+- **Accessibility**: Thêm `aria-label` cho button xóa dự án và link tải ảnh.
+- **Security**: Chạy `npm audit fix`, vá 12 packages có lỗ hổng.
+
+---
+
 ## [0.2.0] - 2026-02-18
 
 ### ✨ Tính năng mới

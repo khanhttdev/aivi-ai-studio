@@ -759,6 +759,12 @@
             "both": "Both",
             "btn_continue": "Continue",
             "generating_outfit": "GENERATING OUTFIT...",
+            "generating_outfit_detail": "AI is generating {char}",
+            "no_image": "No image yet",
+            "loading_text": "Generating...",
+            "regenerate": "Regenerate",
+            "download_image": "Download image",
+            "story_label": "Story",
             "prompt_placeholder_mini": "Change outfit for Mini...",
             "prompt_placeholder_lulu": "Change outfit for Lulu...",
             "toast_success": "Successfully generated {char} image!",
@@ -840,7 +846,8 @@
             "load_fail": "Error loading project",
             "empty_title": "No projects found",
             "empty_subtitle": "Start your first Mimi & Lulu creative journey now!",
-            "btn_create_first": "Create your first project"
+            "btn_create_first": "Create your first project",
+            "generating_thumbnail": "Generating image..."
         }
     }
 }
