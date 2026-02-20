@@ -1059,7 +1059,7 @@ export default function POVStudioPage() {
                                                         <div className="flex items-center justify-between mb-1.5">
                                                             <p className="text-[10px] text-white/40 uppercase tracking-wider">🎥 {t('image_prompt_label')}</p>
                                                             <button
-                                                                onClick={() => handleGenerateSceneImage('hook', result.hook.imagePrompt)}
+                                                                onClick={() => handleGenerateSceneImage('hook', result.hook.imagePrompt || result.hook.text)}
                                                                 disabled={generatingSceneImg['hook']}
                                                                 className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500 hover:text-white transition-colors flex items-center gap-0.5 border border-cyan-500/30"
                                                             >
@@ -1212,7 +1212,7 @@ export default function POVStudioPage() {
                                                     <div className="flex items-center justify-between mb-1.5">
                                                         <p className="text-[10px] text-white/40 uppercase tracking-wider">🎥 {t('image_prompt_label')}</p>
                                                         <button
-                                                            onClick={() => handleGenerateSceneImage('cta', result.cta.imagePrompt)}
+                                                            onClick={() => handleGenerateSceneImage('cta', result.cta.imagePrompt || result.cta.text)}
                                                             disabled={generatingSceneImg['cta']}
                                                             className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500 hover:text-white transition-colors flex items-center gap-0.5 border border-cyan-500/30"
                                                         >

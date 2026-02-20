@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
         const basePrompt = `
         Create a storyboard illustration for a TikTok POV video scene.
         
-        Scene ${sceneIndex !== undefined ? sceneIndex + 1 : ''}: ${visualNote}
+        Section ${typeof sceneIndex === 'number' ? `Scene ${sceneIndex + 1}` : (sceneIndex ? sceneIndex.toString().toUpperCase() : '')}: ${visualNote}
         
         Style Requirements:
         - 3D Pixar/Disney animation style, vibrant colors
