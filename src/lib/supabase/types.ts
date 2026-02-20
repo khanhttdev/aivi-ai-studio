@@ -227,6 +227,47 @@ export interface Database {
                     updated_at?: string
                 }
             }
+            pov_scripts: {
+                Row: {
+                    id: string
+                    user_id: string
+                    title: string
+                    pov_type: string
+                    product_name: string
+                    monster_description: string
+                    scene_count: number
+                    script_data: Json
+                    hook: string
+                    cta: string
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    user_id: string
+                    title: string
+                    pov_type: string
+                    product_name: string
+                    monster_description: string
+                    scene_count: number
+                    script_data: Json
+                    hook: string
+                    cta: string
+                    created_at?: string
+                }
+                Update: {
+                    id?: string
+                    user_id?: string
+                    title?: string
+                    pov_type?: string
+                    product_name?: string
+                    monster_description?: string
+                    scene_count?: number
+                    script_data?: Json
+                    hook?: string
+                    cta?: string
+                    created_at?: string
+                }
+            }
         }
     }
 }

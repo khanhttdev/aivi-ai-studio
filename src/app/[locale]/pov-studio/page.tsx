@@ -231,10 +231,10 @@ export default function POVStudioPage() {
                 product_name: productName,
                 monster_description: monsterDescription,
                 scene_count: sceneCount,
-                script_data: scriptResult.scenes,
+                script_data: scriptResult.scenes as any,
                 hook: scriptResult.hook,
                 cta: scriptResult.cta,
-            });
+            } as any);
 
             if (error) throw error;
             await loadHistory();
