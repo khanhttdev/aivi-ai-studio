@@ -22,18 +22,24 @@ export interface POVScriptRequest {
     apiKey?: string;
 }
 
+export interface POVSection {
+    text: string;
+    imagePrompt: string;
+    motionPrompt: string;
+}
+
 export interface POVScene {
     sceneNumber: number;
     monsterDialogue: string;
-    visualDescription: string;
-    productHighlight: string;
+    imagePrompt: string;
+    motionPrompt: string;
     emotion: string; // scared, angry, desperate, etc.
 }
 
 export interface POVScriptResponse {
     scenes: POVScene[];
-    hook: string;
-    cta: string;
+    hook: POVSection;
+    cta: POVSection;
     title: string;
 }
 
@@ -48,8 +54,8 @@ export interface POVScriptRecord {
     product_image_url: string | null;
     monster_image_url: string | null;
     script_data: POVScene[];
-    hook: string | null;
-    cta: string | null;
+    hook: POVSection | null;
+    cta: POVSection | null;
     created_at: string;
     updated_at: string;
 }

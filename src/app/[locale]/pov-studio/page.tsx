@@ -7,13 +7,15 @@ import { toast } from 'sonner';
 import {
     Upload, Zap, Copy, Download, Trash2, Clock, Plus,
     ChevronDown, Skull, Bug, Package, PawPrint, Star, Sparkles,
-    RefreshCw, FileText, History, X
+    RefreshCw, FileText, History, X, Mic, Image as ImageIcon, Archive, Play, Pause, Volume2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase/client';
 import type { POVType, POVScriptResponse, POVScriptRecord } from '@/types/pov-studio';
 import { formatDistanceToNow } from 'date-fns';
 import { vi, enUS } from 'date-fns/locale';
+import { SAMPLE_RATE } from '@/lib/voice-studio/constants';
+import JSZip from 'jszip';
 
 // POV Type configs
 const POV_TYPES: Array<{ id: POVType; emoji: string; labelKey: string; descKey: string }> = [
@@ -41,12 +43,20 @@ function ImageUploadZone({
     value,
     onChange,
     accept = 'image/*',
+    onGenerate,
+    isGenerating,
+    generateText,
+    generatingText,
 }: {
     label: string;
     hint: string;
     value: string | null;
     onChange: (base64: string | null) => void;
     accept?: string;
+    onGenerate?: () => void;
+    isGenerating?: boolean;
+    generateText?: string;
+    generatingText?: string;
 }) {
     const inputRef = useRef<HTMLInputElement>(null);
     const [isDragging, setIsDragging] = useState(false);
@@ -102,19 +112,51 @@ function ImageUploadZone({
                     >
                         <X size={14} />
                     </button>
-                    <div className="absolute bottom-0 left-0 right-0 px-3 py-2 bg-gradient-to-t from-black/80 to-transparent">
+                    <div className="absolute bottom-0 left-0 right-0 px-3 py-2 bg-gradient-to-t from-black/80 to-transparent flex justify-between items-center">
                         <p className="text-xs text-white/80 font-medium">{label}</p>
+                        {onGenerate && (
+                            <button
+                                onClick={(e) => { e.stopPropagation(); onGenerate(); }}
+                                disabled={isGenerating}
+                                className="text-[10px] font-bold px-2 py-1 rounded bg-orange-500/80 hover:bg-orange-500 text-white transition-colors flex items-center gap-1"
+                            >
+                                {isGenerating ? <RefreshCw size={10} className="animate-spin" /> : <Sparkles size={10} />}
+                                {isGenerating ? generatingText : generateText}
+                            </button>
+                        )}
                     </div>
                 </>
             ) : (
-                <div className="flex flex-col items-center justify-center gap-3 p-6 h-40">
-                    <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
-                        <Upload size={20} className="text-white/40" />
-                    </div>
-                    <div className="text-center">
-                        <p className="text-sm font-semibold text-white/70">{label}</p>
-                        <p className="text-xs text-white/30 mt-0.5">{hint}</p>
-                    </div>
+                <div className="flex flex-col items-center justify-center gap-2 p-4 h-40">
+                    {isGenerating ? (
+                        <>
+                            <div className="w-10 h-10 rounded-2xl bg-orange-500/20 border border-orange-500/30 flex items-center justify-center animate-pulse">
+                                <RefreshCw size={18} className="text-orange-400 animate-spin" />
+                            </div>
+                            <div className="text-center">
+                                <p className="text-xs font-bold text-orange-400">{generatingText || label}</p>
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <div className="w-10 h-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
+                                <Upload size={18} className="text-white/40" />
+                            </div>
+                            <div className="text-center">
+                                <p className="text-sm font-semibold text-white/70">{label}</p>
+                                <p className="text-[10px] text-white/30 mt-0.5 max-w-[120px] mx-auto leading-tight">{hint}</p>
+                            </div>
+                            {onGenerate && (
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); onGenerate(); }}
+                                    className="mt-1 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-orange-500/10 border border-orange-500/20 text-orange-400 hover:bg-orange-500/20 hover:border-orange-500/40 transition-colors text-xs font-bold"
+                                >
+                                    <Sparkles size={12} />
+                                    {generateText}
+                                </button>
+                            )}
+                        </>
+                    )}
                 </div>
             )}
         </div>
@@ -135,9 +177,20 @@ export default function POVStudioPage() {
     const [sceneCount, setSceneCount] = useState(5);
 
     // Result state
+    const [isGeneratingDesc, setIsGeneratingDesc] = useState(false);
+    const [isGeneratingImage, setIsGeneratingImage] = useState(false);
     const [isGenerating, setIsGenerating] = useState(false);
     const [result, setResult] = useState<POVScriptResponse | null>(null);
     const [isSaving, setIsSaving] = useState(false);
+
+    // Scene asset state
+    const [sceneAudios, setSceneAudios] = useState<Record<string | number, string>>({});
+    const [sceneImages, setSceneImages] = useState<Record<string | number, string>>({});
+    const [generatingVoice, setGeneratingVoice] = useState<Record<string | number, boolean>>({});
+    const [generatingSceneImg, setGeneratingSceneImg] = useState<Record<string | number, boolean>>({});
+    const [isExportingZip, setIsExportingZip] = useState(false);
+    const [playingAudio, setPlayingAudio] = useState<string | number | null>(null);
+    const audioRef = useRef<HTMLAudioElement | null>(null);
 
     // History state
     const [history, setHistory] = useState<POVScriptRecord[]>([]);
@@ -164,6 +217,79 @@ export default function POVStudioPage() {
             console.error('Failed to load history:', err);
         } finally {
             setIsLoadingHistory(false);
+        }
+    };
+
+    const handleGenerateDescription = async () => {
+        if (!productName.trim() || !povType) {
+            toast.error(t('error_missing_product_desc'));
+            return;
+        }
+
+        setIsGeneratingDesc(true);
+        try {
+            const apiKey = localStorage.getItem('gemini_api_key') || '';
+            const res = await fetch('/api/pov-script/generate-description', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    productName: productName.trim(),
+                    povType,
+                    productImage,
+                    apiKey,
+                    locale
+                }),
+            });
+
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.error || 'Description generation failed');
+            }
+
+            const data = await res.json();
+            setMonsterDescription(data.result);
+            toast.success(t('success_desc'));
+        } catch (error) {
+            console.error('POV Description generation error:', error);
+            toast.error(error instanceof Error ? error.message : t('error_desc'));
+        } finally {
+            setIsGeneratingDesc(false);
+        }
+    };
+
+    const handleGenerateImage = async () => {
+        if (!monsterDescription.trim()) {
+            toast.error(t('error_missing_desc'));
+            return;
+        }
+
+        setIsGeneratingImage(true);
+        try {
+            const apiKey = localStorage.getItem('gemini_api_key') || '';
+            const res = await fetch('/api/pov-script/generate-image', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    monsterDescription: monsterDescription.trim(),
+                    povType,
+                    productImage,
+                    apiKey
+                }),
+            });
+
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.error || 'Image generation failed');
+            }
+
+            const data = await res.json();
+            setMonsterImage(data.result);
+            toast.success(t('success_image'));
+        } catch (error) {
+            console.error('POV Image generation error:', error);
+            toast.error(error instanceof Error ? error.message : t('error_image'));
+        } finally {
+            setIsGeneratingImage(false);
         }
     };
 
@@ -250,13 +376,13 @@ export default function POVStudioPage() {
         const text = [
             `🎬 ${result.title}`,
             ``,
-            `🪝 HOOK: ${result.hook}`,
+            `🪝 HOOK: ${result.hook.text}`,
             ``,
             ...result.scenes.map(s =>
-                `📍 Cảnh ${s.sceneNumber} [${s.emotion.toUpperCase()}]\n💬 "${s.monsterDialogue}"\n🎥 ${s.visualDescription}\n✨ ${s.productHighlight}`
+                `📍 Cảnh ${s.sceneNumber} [${s.emotion.toUpperCase()}]\n💬 "${s.monsterDialogue}"\n🎥 ${s.imagePrompt}\n✨ ${s.motionPrompt}`
             ),
             ``,
-            `📢 CTA: ${result.cta}`,
+            `📢 CTA: ${result.cta.text}`,
         ].join('\n');
 
         navigator.clipboard.writeText(text);
@@ -269,12 +395,12 @@ export default function POVStudioPage() {
             `POV SCRIPT STUDIO - ${result.title}`,
             `Generated by AIVI AI Studio`,
             ``,
-            `HOOK: ${result.hook}`,
+            `HOOK: ${result.hook.text}`,
             ``,
             ...result.scenes.map(s =>
-                `--- Scene ${s.sceneNumber} [${s.emotion}] ---\nDialogue: "${s.monsterDialogue}"\nVisual: ${s.visualDescription}\nProduct: ${s.productHighlight}\n`
+                `--- Scene ${s.sceneNumber} [${s.emotion}] ---\nDialogue: "${s.monsterDialogue}"\nImage Prompt: ${s.imagePrompt}\nMotion Prompt: ${s.motionPrompt}\n`
             ),
-            `CTA: ${result.cta}`,
+            `CTA: ${result.cta.text}`,
         ].join('\n');
 
         const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
@@ -287,7 +413,211 @@ export default function POVStudioPage() {
         toast.success(t('downloaded'));
     };
 
-    const handleDeleteHistory = async (id: string) => {
+    // --- Scene-level Voiceover Generation ---
+    const handleGenerateVoice = async (sceneIdx: number | string, dialogue: string) => {
+        setGeneratingVoice(prev => ({ ...prev, [sceneIdx]: true }));
+        try {
+            const apiKey = localStorage.getItem('gemini_api_key') || '';
+            const res = await fetch('/api/voice-studio/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    text: dialogue,
+                    voiceName: 'Puck',
+                    apiKey,
+                }),
+            });
+
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.error || 'Voice generation failed');
+            }
+
+            const data = await res.json();
+
+            // Convert raw PCM to WAV
+            const pcmBytes = Uint8Array.from(atob(data.audio), c => c.charCodeAt(0));
+            const wavBuffer = createWavFromPcm(pcmBytes, SAMPLE_RATE);
+            const blob = new Blob([wavBuffer], { type: 'audio/wav' });
+            const audioUrl = URL.createObjectURL(blob);
+
+            setSceneAudios(prev => ({ ...prev, [sceneIdx]: audioUrl }));
+            toast.success(t('success_voice'));
+        } catch (error) {
+            console.error('Voice generation error:', error);
+            toast.error(error instanceof Error ? error.message : t('error_voice'));
+        } finally {
+            setGeneratingVoice(prev => ({ ...prev, [sceneIdx]: false }));
+        }
+    };
+
+    // Helper: Convert PCM to WAV format
+    const createWavFromPcm = (pcmData: Uint8Array, sampleRate: number): ArrayBuffer => {
+        const numChannels = 1;
+        const bitsPerSample = 16;
+        const byteRate = sampleRate * numChannels * (bitsPerSample / 8);
+        const blockAlign = numChannels * (bitsPerSample / 8);
+        const dataSize = pcmData.length;
+        const buffer = new ArrayBuffer(44 + dataSize);
+        const view = new DataView(buffer);
+
+        const writeString = (offset: number, str: string) => {
+            for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+        };
+
+        writeString(0, 'RIFF');
+        view.setUint32(4, 36 + dataSize, true);
+        writeString(8, 'WAVE');
+        writeString(12, 'fmt ');
+        view.setUint32(16, 16, true);
+        view.setUint16(20, 1, true);
+        view.setUint16(22, numChannels, true);
+        view.setUint32(24, sampleRate, true);
+        view.setUint32(28, byteRate, true);
+        view.setUint16(32, blockAlign, true);
+        view.setUint16(34, bitsPerSample, true);
+        writeString(36, 'data');
+        view.setUint32(40, dataSize, true);
+
+        const pcmView = new Uint8Array(buffer, 44);
+        pcmView.set(pcmData);
+
+        return buffer;
+    };
+
+    // --- Scene-level Image Generation ---
+    const handleGenerateSceneImage = async (sceneIdx: number | string, visualNote: string) => {
+        setGeneratingSceneImg(prev => ({ ...prev, [sceneIdx]: true }));
+        try {
+            const apiKey = localStorage.getItem('gemini_api_key') || '';
+            const res = await fetch('/api/pov-script/generate-scene-image', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    visualNote,
+                    sceneIndex: sceneIdx,
+                    monsterImage,
+                    productImage,
+                    povType,
+                    apiKey,
+                }),
+            });
+
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.error || 'Scene image generation failed');
+            }
+
+            const data = await res.json();
+            setSceneImages(prev => ({ ...prev, [sceneIdx]: data.result }));
+            toast.success(t('success_scene_img'));
+        } catch (error) {
+            console.error('Scene image generation error:', error);
+            toast.error(error instanceof Error ? error.message : t('error_scene_img'));
+        } finally {
+            setGeneratingSceneImg(prev => ({ ...prev, [sceneIdx]: false }));
+        }
+    };
+
+    // --- Play/Pause Audio ---
+    const handlePlayAudio = (sceneIdx: number | string) => {
+        if (playingAudio === sceneIdx) {
+            audioRef.current?.pause();
+            setPlayingAudio(null);
+            return;
+        }
+
+        if (audioRef.current) {
+            audioRef.current.pause();
+        }
+
+        const audio = new Audio(sceneAudios[sceneIdx]);
+        audioRef.current = audio;
+        audio.play();
+        setPlayingAudio(sceneIdx);
+        audio.onended = () => setPlayingAudio(null);
+    };
+
+    // --- Export ZIP ---
+    const handleExportZip = async () => {
+        if (!result) return;
+        setIsExportingZip(true);
+        try {
+            const zip = new JSZip();
+
+            // Add script text
+            const scriptText = [
+                `POV SCRIPT STUDIO - ${result.title}`,
+                `Generated by AIVI AI Studio`,
+                ``,
+                `HOOK: ${result.hook.text}`,
+                ``,
+                ...result.scenes.map(s =>
+                    `--- Scene ${s.sceneNumber} [${s.emotion}] ---\nDialogue: "${s.monsterDialogue}"\nImage Prompt: ${s.imagePrompt}\nMotion Prompt: ${s.motionPrompt}\n`
+                ),
+                `CTA: ${result.cta.text}`,
+            ].join('\n');
+            zip.file('script.txt', scriptText);
+
+            // Add audio files
+            for (const [idx, audioUrl] of Object.entries(sceneAudios)) {
+                try {
+                    const response = await fetch(audioUrl);
+                    const blob = await response.blob();
+                    zip.file(`scene-${Number(idx) + 1}-voice.wav`, blob);
+                } catch (e) {
+                    console.warn(`Failed to add audio for scene ${idx}:`, e);
+                }
+            }
+
+            // Add image files
+            for (const [idx, imgSrc] of Object.entries(sceneImages)) {
+                try {
+                    if (imgSrc.startsWith('data:')) {
+                        const base64Data = imgSrc.split('base64,')[1];
+                        const byteChars = atob(base64Data);
+                        const byteArray = new Uint8Array(byteChars.length);
+                        for (let i = 0; i < byteChars.length; i++) byteArray[i] = byteChars.charCodeAt(i);
+                        zip.file(`scene-${Number(idx) + 1}-storyboard.png`, byteArray);
+                    } else {
+                        // URL-based image (Pollinations fallback)
+                        const response = await fetch(imgSrc);
+                        const blob = await response.blob();
+                        zip.file(`scene-${Number(idx) + 1}-storyboard.png`, blob);
+                    }
+                } catch (e) {
+                    console.warn(`Failed to add image for scene ${idx}:`, e);
+                }
+            }
+
+            // Add character image if exists
+            if (monsterImage && monsterImage.startsWith('data:')) {
+                const base64Data = monsterImage.split('base64,')[1];
+                const byteChars = atob(base64Data);
+                const byteArray = new Uint8Array(byteChars.length);
+                for (let i = 0; i < byteChars.length; i++) byteArray[i] = byteChars.charCodeAt(i);
+                zip.file('character.png', byteArray);
+            }
+
+            const content = await zip.generateAsync({ type: 'blob' });
+            const url = URL.createObjectURL(content);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `pov-kit-${Date.now()}.zip`;
+            a.click();
+            URL.revokeObjectURL(url);
+            toast.success(t('success_zip'));
+        } catch (error) {
+            console.error('ZIP export error:', error);
+            toast.error(t('error_zip'));
+        } finally {
+            setIsExportingZip(false);
+        }
+    };
+
+    const handleDeleteHistory = async (id: string, e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (!window.confirm(t('confirm_delete'))) return;
         try {
             const { error } = await supabase.from('pov_scripts').delete().eq('id', id);
             if (error) throw error;
@@ -305,8 +635,8 @@ export default function POVStudioPage() {
         setPovType(record.pov_type);
         setResult({
             title: record.title,
-            hook: record.hook || '',
-            cta: record.cta || '',
+            hook: typeof record.hook === 'string' ? { text: record.hook as any, imagePrompt: '', motionPrompt: '' } : ((record.hook as any) || { text: '', imagePrompt: '', motionPrompt: '' }),
+            cta: typeof record.cta === 'string' ? { text: record.cta as any, imagePrompt: '', motionPrompt: '' } : ((record.cta as any) || { text: '', imagePrompt: '', motionPrompt: '' }),
             scenes: record.script_data,
         });
         setShowHistory(false);
@@ -428,6 +758,10 @@ export default function POVStudioPage() {
                                         hint={t('upload_monster_hint')}
                                         value={monsterImage}
                                         onChange={setMonsterImage}
+                                        onGenerate={handleGenerateImage}
+                                        isGenerating={isGeneratingImage}
+                                        generateText={t('btn_auto_generate')}
+                                        generatingText={t('generating_image')}
                                     />
                                 </div>
                             </div>
@@ -457,9 +791,19 @@ export default function POVStudioPage() {
 
                                 {/* Monster Description */}
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-white/60 uppercase tracking-wider">
-                                        {t('label_monster_desc')} {selectedPovConfig && <span className="text-orange-400">{selectedPovConfig.emoji}</span>}
-                                    </label>
+                                    <div className="flex items-center justify-between">
+                                        <label className="text-xs font-bold text-white/60 uppercase tracking-wider">
+                                            {t('label_monster_desc')} {selectedPovConfig && <span className="text-orange-400">{selectedPovConfig.emoji}</span>}
+                                        </label>
+                                        <button
+                                            onClick={handleGenerateDescription}
+                                            disabled={isGeneratingDesc}
+                                            className="text-[10px] font-bold px-2 py-1 rounded bg-orange-500/20 text-orange-400 hover:bg-orange-500 hover:text-white transition-colors flex items-center gap-1 border border-orange-500/30"
+                                        >
+                                            {isGeneratingDesc ? <RefreshCw size={10} className="animate-spin" /> : <Sparkles size={10} />}
+                                            {t('btn_auto_desc')}
+                                        </button>
+                                    </div>
                                     <textarea
                                         value={monsterDescription}
                                         onChange={(e) => setMonsterDescription(e.target.value)}
@@ -587,7 +931,7 @@ export default function POVStudioPage() {
                                                             </div>
                                                         </button>
                                                         <button
-                                                            onClick={() => handleDeleteHistory(record.id)}
+                                                            onClick={(e) => handleDeleteHistory(record.id, e)}
                                                             className="p-1.5 text-white/20 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
                                                         >
                                                             <Trash2 size={14} />
@@ -674,9 +1018,64 @@ export default function POVStudioPage() {
                                             </div>
 
                                             {/* Hook */}
-                                            <div className="bg-orange-500/10 border border-orange-500/20 rounded-2xl p-4">
-                                                <p className="text-[10px] font-black text-orange-400 uppercase tracking-widest mb-2">🪝 Hook</p>
-                                                <p className="text-sm text-white/80 font-medium">{result.hook}</p>
+                                            <div className="bg-orange-500/10 border border-orange-500/20 rounded-2xl p-4 space-y-3">
+                                                <p className="text-[10px] font-black text-orange-400 uppercase tracking-widest">🪝 Hook</p>
+
+                                                <div className="bg-white/5 rounded-xl p-3">
+                                                    <div className="flex items-center justify-between mb-1.5">
+                                                        <p className="text-[10px] text-white/40 uppercase tracking-wider">💬 {t('dialogue_label')}</p>
+                                                        <button
+                                                            onClick={() => handleGenerateVoice('hook', result.hook.text)}
+                                                            disabled={generatingVoice['hook']}
+                                                            className="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-500/20 text-purple-400 hover:bg-purple-500 hover:text-white transition-colors flex items-center gap-1 border border-purple-500/30"
+                                                        >
+                                                            {generatingVoice['hook'] ? <RefreshCw size={10} className="animate-spin" /> : <Mic size={10} />}
+                                                            {generatingVoice['hook'] ? t('generating_voice') : t('btn_generate_voice')}
+                                                        </button>
+                                                    </div>
+                                                    <p className="text-sm text-white font-medium italic">&quot;{result.hook.text}&quot;</p>
+                                                    {sceneAudios['hook'] && (
+                                                        <div className="mt-2 flex items-center gap-2">
+                                                            <button
+                                                                onClick={() => handlePlayAudio('hook')}
+                                                                className="p-1.5 rounded-lg bg-purple-500/20 text-purple-400 hover:bg-purple-500 hover:text-white transition-colors"
+                                                            >
+                                                                {playingAudio === 'hook' ? <Pause size={12} /> : <Play size={12} />}
+                                                            </button>
+                                                            <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
+                                                                <div className={cn('h-full bg-purple-500 rounded-full transition-all', playingAudio === 'hook' ? 'animate-pulse w-full' : 'w-0')} />
+                                                            </div>
+                                                            <Volume2 size={10} className="text-purple-400/50" />
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <div className="grid grid-cols-2 gap-2">
+                                                    <div className="bg-white/5 rounded-xl p-3">
+                                                        <div className="flex items-center justify-between mb-1.5">
+                                                            <p className="text-[10px] text-white/40 uppercase tracking-wider">🎥 {t('image_prompt_label')}</p>
+                                                            <button
+                                                                onClick={() => handleGenerateSceneImage('hook', result.hook.imagePrompt)}
+                                                                disabled={generatingSceneImg['hook']}
+                                                                className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500 hover:text-white transition-colors flex items-center gap-0.5 border border-cyan-500/30"
+                                                            >
+                                                                {generatingSceneImg['hook'] ? <RefreshCw size={8} className="animate-spin" /> : <ImageIcon size={8} />}
+                                                                {generatingSceneImg['hook'] ? '...' : t('btn_generate_scene_img')}
+                                                            </button>
+                                                        </div>
+                                                        <p className="text-xs text-white/70">{result.hook.imagePrompt}</p>
+                                                        {sceneImages['hook'] && (
+                                                            <div className="mt-2 rounded-lg overflow-hidden border border-cyan-500/20">
+                                                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                                <img src={sceneImages['hook']} alt={`Hook Scene`} className="w-full h-32 object-cover" />
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <div className="bg-orange-500/5 border border-orange-500/10 rounded-xl p-3">
+                                                        <p className="text-[10px] text-orange-400/70 uppercase tracking-wider mb-1.5">🎬 {t('motion_prompt_label')}</p>
+                                                        <p className="text-xs text-white/70">{result.hook.motionPrompt}</p>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
 
@@ -711,19 +1110,59 @@ export default function POVStudioPage() {
 
                                                         {/* Dialogue */}
                                                         <div className="bg-white/5 rounded-xl p-3">
-                                                            <p className="text-[10px] text-white/40 uppercase tracking-wider mb-1.5">💬 {t('dialogue_label')}</p>
-                                                            <p className="text-sm text-white font-medium italic">"{scene.monsterDialogue}"</p>
+                                                            <div className="flex items-center justify-between mb-1.5">
+                                                                <p className="text-[10px] text-white/40 uppercase tracking-wider">💬 {t('dialogue_label')}</p>
+                                                                <button
+                                                                    onClick={() => handleGenerateVoice(idx, scene.monsterDialogue)}
+                                                                    disabled={generatingVoice[idx]}
+                                                                    className="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-500/20 text-purple-400 hover:bg-purple-500 hover:text-white transition-colors flex items-center gap-1 border border-purple-500/30"
+                                                                >
+                                                                    {generatingVoice[idx] ? <RefreshCw size={10} className="animate-spin" /> : <Mic size={10} />}
+                                                                    {generatingVoice[idx] ? t('generating_voice') : t('btn_generate_voice')}
+                                                                </button>
+                                                            </div>
+                                                            <p className="text-sm text-white font-medium italic">&quot;{scene.monsterDialogue}&quot;</p>
+                                                            {sceneAudios[idx] && (
+                                                                <div className="mt-2 flex items-center gap-2">
+                                                                    <button
+                                                                        onClick={() => handlePlayAudio(idx)}
+                                                                        className="p-1.5 rounded-lg bg-purple-500/20 text-purple-400 hover:bg-purple-500 hover:text-white transition-colors"
+                                                                    >
+                                                                        {playingAudio === idx ? <Pause size={12} /> : <Play size={12} />}
+                                                                    </button>
+                                                                    <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
+                                                                        <div className={cn('h-full bg-purple-500 rounded-full transition-all', playingAudio === idx ? 'animate-pulse w-full' : 'w-0')} />
+                                                                    </div>
+                                                                    <Volume2 size={10} className="text-purple-400/50" />
+                                                                </div>
+                                                            )}
                                                         </div>
 
-                                                        {/* Visual */}
+                                                        {/* Visual + Product */}
                                                         <div className="grid grid-cols-2 gap-2">
                                                             <div className="bg-white/5 rounded-xl p-3">
-                                                                <p className="text-[10px] text-white/40 uppercase tracking-wider mb-1.5">🎥 {t('visual_label')}</p>
-                                                                <p className="text-xs text-white/70">{scene.visualDescription}</p>
+                                                                <div className="flex items-center justify-between mb-1.5">
+                                                                    <p className="text-[10px] text-white/40 uppercase tracking-wider">🎥 {t('image_prompt_label')}</p>
+                                                                    <button
+                                                                        onClick={() => handleGenerateSceneImage(idx, scene.imagePrompt)}
+                                                                        disabled={generatingSceneImg[idx]}
+                                                                        className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500 hover:text-white transition-colors flex items-center gap-0.5 border border-cyan-500/30"
+                                                                    >
+                                                                        {generatingSceneImg[idx] ? <RefreshCw size={8} className="animate-spin" /> : <ImageIcon size={8} />}
+                                                                        {generatingSceneImg[idx] ? '...' : t('btn_generate_scene_img')}
+                                                                    </button>
+                                                                </div>
+                                                                <p className="text-xs text-white/70">{scene.imagePrompt}</p>
+                                                                {sceneImages[idx] && (
+                                                                    <div className="mt-2 rounded-lg overflow-hidden border border-cyan-500/20">
+                                                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                                        <img src={sceneImages[idx]} alt={`Scene ${idx + 1}`} className="w-full h-32 object-cover" />
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                             <div className="bg-orange-500/5 border border-orange-500/10 rounded-xl p-3">
-                                                                <p className="text-[10px] text-orange-400/70 uppercase tracking-wider mb-1.5">✨ {t('product_label')}</p>
-                                                                <p className="text-xs text-white/70">{scene.productHighlight}</p>
+                                                                <p className="text-[10px] text-orange-400/70 uppercase tracking-wider mb-1.5">🎬 {t('motion_prompt_label')}</p>
+                                                                <p className="text-xs text-white/70">{scene.motionPrompt}</p>
                                                             </div>
                                                         </div>
                                                     </m.div>
@@ -732,13 +1171,68 @@ export default function POVStudioPage() {
                                         </div>
 
                                         {/* CTA */}
-                                        <div className="bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20 rounded-2xl p-4">
-                                            <p className="text-[10px] font-black text-orange-400 uppercase tracking-widest mb-2">📢 CTA</p>
-                                            <p className="text-sm text-white/80 font-medium">{result.cta}</p>
+                                        <div className="bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20 rounded-2xl p-4 space-y-3">
+                                            <p className="text-[10px] font-black text-orange-400 uppercase tracking-widest">📢 CTA</p>
+
+                                            <div className="bg-white/5 rounded-xl p-3">
+                                                <div className="flex items-center justify-between mb-1.5">
+                                                    <p className="text-[10px] text-white/40 uppercase tracking-wider">💬 {t('dialogue_label')}</p>
+                                                    <button
+                                                        onClick={() => handleGenerateVoice('cta', result.cta.text)}
+                                                        disabled={generatingVoice['cta']}
+                                                        className="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-500/20 text-purple-400 hover:bg-purple-500 hover:text-white transition-colors flex items-center gap-1 border border-purple-500/30"
+                                                    >
+                                                        {generatingVoice['cta'] ? <RefreshCw size={10} className="animate-spin" /> : <Mic size={10} />}
+                                                        {generatingVoice['cta'] ? t('generating_voice') : t('btn_generate_voice')}
+                                                    </button>
+                                                </div>
+                                                <p className="text-sm text-white font-medium italic">&quot;{result.cta.text}&quot;</p>
+                                                {sceneAudios['cta'] && (
+                                                    <div className="mt-2 flex items-center gap-2">
+                                                        <button
+                                                            onClick={() => handlePlayAudio('cta')}
+                                                            className="p-1.5 rounded-lg bg-purple-500/20 text-purple-400 hover:bg-purple-500 hover:text-white transition-colors"
+                                                        >
+                                                            {playingAudio === 'cta' ? <Pause size={12} /> : <Play size={12} />}
+                                                        </button>
+                                                        <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
+                                                            <div className={cn('h-full bg-purple-500 rounded-full transition-all', playingAudio === 'cta' ? 'animate-pulse w-full' : 'w-0')} />
+                                                        </div>
+                                                        <Volume2 size={10} className="text-purple-400/50" />
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <div className="bg-white/5 rounded-xl p-3">
+                                                    <div className="flex items-center justify-between mb-1.5">
+                                                        <p className="text-[10px] text-white/40 uppercase tracking-wider">🎥 {t('image_prompt_label')}</p>
+                                                        <button
+                                                            onClick={() => handleGenerateSceneImage('cta', result.cta.imagePrompt)}
+                                                            disabled={generatingSceneImg['cta']}
+                                                            className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500 hover:text-white transition-colors flex items-center gap-0.5 border border-cyan-500/30"
+                                                        >
+                                                            {generatingSceneImg['cta'] ? <RefreshCw size={8} className="animate-spin" /> : <ImageIcon size={8} />}
+                                                            {generatingSceneImg['cta'] ? '...' : t('btn_generate_scene_img')}
+                                                        </button>
+                                                    </div>
+                                                    <p className="text-xs text-white/70">{result.cta.imagePrompt}</p>
+                                                    {sceneImages['cta'] && (
+                                                        <div className="mt-2 rounded-lg overflow-hidden border border-cyan-500/20">
+                                                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                            <img src={sceneImages['cta']} alt={`CTA Scene`} className="w-full h-32 object-cover" />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="bg-orange-500/5 border border-orange-500/10 rounded-xl p-3">
+                                                    <p className="text-[10px] text-orange-400/70 uppercase tracking-wider mb-1.5">🎬 {t('motion_prompt_label')}</p>
+                                                    <p className="text-xs text-white/70">{result.cta.motionPrompt}</p>
+                                                </div>
+                                            </div>
                                         </div>
 
                                         {/* Action Buttons */}
-                                        <div className="grid grid-cols-2 gap-3">
+                                        <div className="grid grid-cols-3 gap-3">
                                             <button
                                                 onClick={handleCopyScript}
                                                 className="flex items-center justify-center gap-2 py-3 rounded-2xl bg-white/5 border border-white/10 text-white/70 hover:text-white hover:border-white/20 font-bold text-sm transition-all"
@@ -748,10 +1242,18 @@ export default function POVStudioPage() {
                                             </button>
                                             <button
                                                 onClick={handleDownload}
-                                                className="flex items-center justify-center gap-2 py-3 rounded-2xl bg-orange-500/10 border border-orange-500/30 text-orange-400 hover:bg-orange-500/20 font-bold text-sm transition-all"
+                                                className="flex items-center justify-center gap-2 py-3 rounded-2xl bg-white/5 border border-white/10 text-white/70 hover:text-white hover:border-white/20 font-bold text-sm transition-all"
                                             >
                                                 <Download size={16} />
                                                 {t('btn_download')}
+                                            </button>
+                                            <button
+                                                onClick={handleExportZip}
+                                                disabled={isExportingZip}
+                                                className="flex items-center justify-center gap-2 py-3 rounded-2xl bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border border-cyan-500/30 text-cyan-400 hover:from-cyan-500/20 hover:to-purple-500/20 font-bold text-sm transition-all"
+                                            >
+                                                {isExportingZip ? <RefreshCw size={16} className="animate-spin" /> : <Archive size={16} />}
+                                                {isExportingZip ? t('exporting_zip') : t('btn_export_zip')}
                                             </button>
                                         </div>
                                     </m.div>
