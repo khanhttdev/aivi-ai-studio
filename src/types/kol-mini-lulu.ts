@@ -53,6 +53,15 @@ export interface MiniLuluState {
     luluConfig: { prompt: string; image: string | null };
     conceptImageUrl: string | null;
 
+    // Marketing / Booking
+    productInfo: {
+        enabled: boolean;
+        name: string;
+        usp: string;
+        image: string | null;
+        type: 'general' | 'fashion';
+    };
+
     // Script (Step 3)
     selectedTone: 'funny' | 'emotional' | 'action';
     script: Scene[];
@@ -75,6 +84,7 @@ export interface MiniLuluState {
     setMiniConfig: (config: { prompt?: string; image?: string | null }) => void;
     setLuluConfig: (config: { prompt?: string; image?: string | null }) => void;
     setConceptImageUrl: (url: string | null) => void;
+    setProductInfo: (info: Partial<{ enabled: boolean; name: string; usp: string; image: string | null; type: 'general' | 'fashion' }>) => void;
     setSelectedTone: (tone: 'funny' | 'emotional' | 'action') => void;
     setCharacter: (char: CharacterId) => void;
     setScript: (script: Scene[]) => void;
@@ -105,6 +115,7 @@ export const extractLuluStateForPersistence = (state: MiniLuluState): Partial<Mi
         miniConfig,
         luluConfig,
         conceptImageUrl,
+        productInfo,
         selectedTone,
         script,
         seoData
@@ -122,6 +133,7 @@ export const extractLuluStateForPersistence = (state: MiniLuluState): Partial<Mi
         miniConfig,
         luluConfig,
         conceptImageUrl,
+        productInfo,
         selectedTone,
         script,
         seoData

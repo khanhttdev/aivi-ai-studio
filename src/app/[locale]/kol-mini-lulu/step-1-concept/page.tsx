@@ -24,7 +24,9 @@ export default function Step1ConceptPage() {
         setIsGeneratingIdea,
         selectedCategory,
         setSelectedCategory,
-        reset
+        reset,
+        productInfo,
+        setProductInfo
     } = useKolMiniLuluStore();
 
     // Get templates based on selected category
@@ -48,6 +50,21 @@ export default function Step1ConceptPage() {
 
     const handleNext = () => {
         if (selectedTemplateId || customPrompt.trim()) {
+            // Auto-select character based on category
+            if (selectedCategory) {
+                const miniCats = ['food', 'home', 'fashion', 'health'];
+                const luluCats = ['tech', 'education', 'finance', 'travel'];
+                // Ent, Lifestyle => Both (default)
+
+                if (miniCats.includes(selectedCategory)) {
+                    useKolMiniLuluStore.getState().setCharacter('mini');
+                } else if (luluCats.includes(selectedCategory)) {
+                    useKolMiniLuluStore.getState().setCharacter('lulu');
+                } else {
+                    useKolMiniLuluStore.getState().setCharacter('both');
+                }
+            }
+
             router.push(`/${locale}/kol-mini-lulu/step-2-casting`);
         }
     };
@@ -132,6 +149,130 @@ export default function Step1ConceptPage() {
                 ))}
             </div>
 
+            {/* Advertising Mode Toggle */}
+            <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl p-6 transition-all hover:border-blue-500/50">
+                <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                        <div className={cn("p-2 rounded-lg", productInfo.enabled ? "bg-blue-500/20 text-blue-400" : "bg-gray-800 text-gray-400")}>
+                            <Tag className="w-5 h-5" />
+                        </div>
+                        <div>
+                            <h3 className="font-bold text-lg text-white">{t('ad_mode_title')}</h3>
+                            <p className="text-sm text-[var(--text-secondary)]">{t('ad_mode_desc')}</p>
+                        </div>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                            type="checkbox"
+                            checked={productInfo.enabled}
+                            onChange={(e) => setProductInfo({ enabled: e.target.checked })}
+                            className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    </label>
+                </div>
+
+                {productInfo.enabled && (
+                    <div className="space-y-4 animate-in slide-in-from-top-2 duration-300">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-[var(--text-secondary)]">{t('product_name_label')}</label>
+                                <input
+                                    type="text"
+                                    value={productInfo.name}
+                                    onChange={(e) => setProductInfo({ name: e.target.value })}
+                                    placeholder={t('product_name_placeholder')}
+                                    className="w-full bg-[var(--bg-secondary)] border border-[var(--border)] rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-[var(--text-secondary)]">{t('product_usp_label')}</label>
+                                <input
+                                    type="text"
+                                    value={productInfo.usp}
+                                    onChange={(e) => setProductInfo({ usp: e.target.value })}
+                                    placeholder={t('product_usp_placeholder')}
+                                    className="w-full bg-[var(--bg-secondary)] border border-[var(--border)] rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Product Type Selection */}
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-[var(--text-secondary)]">{t('product_type_label')}</label>
+                            <div className="grid grid-cols-2 gap-3">
+                                <button
+                                    onClick={() => setProductInfo({ type: 'general' })}
+                                    className={cn(
+                                        "px-4 py-2 rounded-xl text-sm font-medium border transition-all",
+                                        productInfo.type === 'general' || !productInfo.type
+                                            ? "bg-blue-500/20 border-blue-500/50 text-blue-400"
+                                            : "bg-[var(--bg-secondary)] border-[var(--border)] text-[var(--text-secondary)] hover:border-blue-500/30"
+                                    )}
+                                >
+                                    {t('product_type_general')}
+                                </button>
+                                <button
+                                    onClick={() => setProductInfo({ type: 'fashion' })}
+                                    className={cn(
+                                        "px-4 py-2 rounded-xl text-sm font-medium border transition-all",
+                                        productInfo.type === 'fashion'
+                                            ? "bg-pink-500/20 border-pink-500/50 text-pink-400"
+                                            : "bg-[var(--bg-secondary)] border-[var(--border)] text-[var(--text-secondary)] hover:border-pink-500/30"
+                                    )}
+                                >
+                                    {t('product_type_fashion')}
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Product Image Upload */}
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-[var(--text-secondary)]">
+                                {productInfo.type === 'fashion' ? t('product_clothing_label') : t('product_image_label')}
+                            </label>
+                            <div className="flex items-center gap-4">
+                                {productInfo.image ? (
+                                    <div className="relative w-24 h-24 rounded-xl overflow-hidden border border-blue-500/30 group">
+                                        <img src={productInfo.image} alt="Product" className="w-full h-full object-cover" />
+                                        <button
+                                            onClick={() => setProductInfo({ image: null })}
+                                            className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                        >
+                                            <X className="w-6 h-6 text-white" />
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <label className="w-24 h-24 flex flex-col items-center justify-center border-2 border-dashed border-[var(--border)] rounded-xl cursor-pointer hover:border-blue-500/50 hover:bg-blue-500/5 transition-all">
+                                        <span className="text-xs text-[var(--text-secondary)] text-center px-1">{t('upload_image')}</span>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            className="hidden"
+                                            onChange={(e) => {
+                                                const file = e.target.files?.[0];
+                                                if (file) {
+                                                    const reader = new FileReader();
+                                                    reader.onloadend = () => {
+                                                        setProductInfo({ image: reader.result as string });
+                                                    };
+                                                    reader.readAsDataURL(file);
+                                                }
+                                            }}
+                                        />
+                                    </label>
+                                )}
+                                <div className="text-xs text-[var(--text-secondary)] max-w-[200px]">
+                                    {productInfo.type === 'fashion'
+                                        ? "AI sẽ mặc trang phục này cho nhân vật. Vui lòng upload ảnh rõ nét, trải phẳng hoặc ma-nơ-canh."
+                                        : t('product_image_hint')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
+
             {/* Custom Input */}
             <div className="space-y-4">
                 <div className="flex items-center gap-4">
@@ -150,11 +291,15 @@ export default function Step1ConceptPage() {
                             onClick={async () => {
                                 setIsGeneratingIdea(true);
                                 try {
-                                    const res = await fetch('/api/kol-mini-lulu/generate-ideas', {
+                                    const response = await fetch('/api/kol-mini-lulu/generate-ideas', {
                                         method: 'POST',
-                                        body: JSON.stringify({ category: selectedCategory })
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({
+                                            category: selectedCategory, // Pass selected category to enforce character constraints
+                                            productInfo: productInfo.enabled ? productInfo : undefined // Pass product info if enabled
+                                        })
                                     });
-                                    const data = await res.json();
+                                    const data = await response.json();
                                     if (data.idea) setCustomPrompt(data.idea);
                                 } catch (e) {
                                     console.error(e);
@@ -183,10 +328,10 @@ export default function Step1ConceptPage() {
                         className="w-full h-32 bg-[var(--bg-secondary)] border border-[var(--border)] rounded-xl p-4 focus:ring-2 focus:ring-pink-500 focus:outline-none transition-all resize-none"
                     />
                 </div>
-            </div>
+            </div >
 
             {/* Navigation */}
-            <div className="flex justify-end pt-8">
+            < div className="flex justify-end pt-8" >
                 <button
                     onClick={handleNext}
                     disabled={!selectedTemplateId && !customPrompt.trim()}
@@ -195,7 +340,7 @@ export default function Step1ConceptPage() {
                     {t('btn_next')}
                     <ArrowRight className="w-5 h-5" />
                 </button>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }

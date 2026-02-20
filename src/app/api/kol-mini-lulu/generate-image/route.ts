@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
 
     try {
         const body = await request.json();
-        const { prompt, character, customPrompt, apiKey } = body;
+        const { prompt, character, customPrompt, apiKey, referenceImage, productImage, productType } = body;
 
         if (!prompt) {
             return NextResponse.json(
@@ -28,18 +28,41 @@ export async function POST(request: NextRequest) {
 
         // Build character description
         const charDesc = character === 'both'
-            ? 'A cute grey British Shorthair Cat named Mini (with amber eyes, chubby, grumpy-cute expression) AND a golden Golden Retriever Dog named Lulu (happy smile, tongue out, fluffy)'
+            ? 'A cute grey British Shorthair Cat named Mini AND a golden Golden Retriever Dog named Lulu'
             : character === 'mini'
-                ? 'A cute grey British Shorthair Cat named Mini (amber eyes, chubby, grumpy-cute expression, red bow tie)'
-                : 'A golden Golden Retriever Dog named Lulu (happy smile, tongue out, fluffy, blue scarf)';
+                ? 'A cute grey British Shorthair Cat named Mini'
+                : 'A golden Golden Retriever Dog named Lulu';
 
         // Construct a highly detailed prompt for 3D Pixar style
-        const basePrompt = `
+        let basePrompt = `
         Create a 3D Pixar/Disney-style animation scene. High quality, vibrant colors, expressive lighting.
         
         Character(s): ${charDesc}.
         ${customPrompt ? `Character context: ${customPrompt}.` : ''}
-        
+        ${referenceImage ? 'IMPORTANT: MATCH THE CHARACTER APPEARANCE (OUTFIT, FACE, BODY) EXACTLY WITH THE REFERENCE IMAGE PROVIDED.' : ''}
+        `;
+
+        // Add Product Logic
+        if (productImage) {
+            if (productType === 'fashion') {
+                basePrompt += `
+        IMPORTANT: FASHION TRY-ON TASK.
+        The character MUST be WEARING the clothing item shown in the product image.
+        - Analyze the clothing style, material, and color from the product image.
+        - DRESS the character in this exact outfit.
+        - Ensure the fit is natural and matches the character's body type.
+        - The character is NOT holding the product, they are WEARING it.
+        `;
+            } else {
+                basePrompt += `
+        IMPORTANT: PRODUCT PLACEMENT TASK.
+        The character should be interacting with, holding, or standing next to the product shown in the product image.
+        MATCH THE PRODUCT APPEARANCE EXACTLY.
+        `;
+            }
+        }
+
+        basePrompt += `
         Scene: ${prompt}
         
         Style: 3D render, Pixar animation quality, Octane render, 8K, highly detailed, cinematic lighting.
@@ -47,11 +70,42 @@ export async function POST(request: NextRequest) {
         Background: Rich, detailed environment matching the scene.
         `;
 
-        // Try primary model: gemini-2.0-flash-preview-image-generation
+        // Prepare contents
+        const parts: any[] = [];
+
+        // 1. Add Reference Image (Character)
+        if (referenceImage) {
+            parts.push({
+                inlineData: {
+                    mimeType: 'image/png',
+                    data: referenceImage.split(',')[1] || referenceImage
+                }
+            });
+        }
+
+        // 2. Add Product Image
+        if (productImage) {
+            parts.push({
+                inlineData: {
+                    mimeType: 'image/png',
+                    data: productImage.split(',')[1] || productImage
+                }
+            });
+        }
+
+        // 3. Add Text Prompt
+        parts.push({ text: basePrompt });
+
+        const contents: any[] = [{
+            role: 'user',
+            parts: parts
+        }];
+
+        // Try primary model: gemini-3-pro-image-preview
         try {
             const imageResponse = await genAI.models.generateContent({
-                model: 'gemini-3-pro-image-preview',
-                contents: [{ role: 'user', parts: [{ text: basePrompt }] }],
+                model: 'gemini-3-pro-image-preview', // Supports multimodal
+                contents: contents,
                 config: {
                     responseModalities: ['image'],
                 }
@@ -76,7 +130,7 @@ export async function POST(request: NextRequest) {
             try {
                 const fallbackResponse = await genAI.models.generateContent({
                     model: 'gemini-2.0-flash-preview-image-generation',
-                    contents: [{ role: 'user', parts: [{ text: basePrompt }] }],
+                    contents: contents,
                     config: {
                         responseModalities: ['image', 'text'],
                     }
@@ -96,7 +150,7 @@ export async function POST(request: NextRequest) {
             } catch (fallbackError) {
                 console.warn("Fallback model also failed, using Pollinations:", fallbackError);
 
-                // Final fallback: Pollinations.ai
+                // Final fallback: Pollinations.ai (Text only)
                 const safePrompt = encodeURIComponent(basePrompt.slice(0, 300));
                 const seed = Math.floor(Math.random() * 100000);
                 const imageUrl = `https://image.pollinations.ai/prompt/${safePrompt}?width=576&height=1024&model=flux&seed=${seed}&nologo=true`;

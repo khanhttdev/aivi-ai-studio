@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
 
     try {
         const body = await request.json();
-        const { idea, characterPrompt, locale, apiKey } = body;
+        const { idea, characterPrompt, locale, apiKey, character, category, referenceImage } = body;
 
         const finalApiKey = apiKey || process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY || "";
 
@@ -22,33 +22,62 @@ export async function POST(request: NextRequest) {
 
         const genAI = new GoogleGenAI({ apiKey: finalApiKey });
 
+        // Determine character description based on selection
+        let charDesc = '';
+        if (character === 'mini') {
+            charDesc = '- Mini: A cute grey British Shorthair Cat with amber eyes, chubby, grumpy-cute expression. (SOLO STAR)';
+        } else if (character === 'lulu') {
+            charDesc = '- Lulu: A golden Golden Retriever Dog with a big happy smile, tongue out, fluffy. (SOLO STAR)';
+        } else {
+            charDesc = `
+            - Mini: A cute grey British Shorthair Cat with amber eyes, grumpy-cute.
+            - Lulu: A golden Golden Retriever Dog with happy smile, fluffy.
+            `;
+        }
+
         // Construct a highly detailed prompt for viral thumbnail
         const basePrompt = `
         Create a VIRAL YouTube/TikTok Thumbnail in 3D Pixar/Disney Animation Style.
         
-        Characters: 
-        - Mini: A cute grey British Shorthair Cat with amber eyes, chubby, slightly grumpy-cute expression, wearing a red bow tie.
-        - Lulu: A golden Golden Retriever Dog with a big happy smile, tongue out, fluffy, wearing a blue scarf.
+        Category: ${category || 'General Entertainment'}
+        Theme/Story: "${idea || characterPrompt || 'Funny chaotic situation'}"
         
-        Theme/Story: "${idea || characterPrompt || 'Funny chaotic situation between a cat and a dog'}"
+        Characters: 
+        ${charDesc}
+        ${referenceImage ? 'IMPORTANT: MATCH THE CHARACTER FACE AND BODY EXACTLY WITH THE REFERENCE IMAGE.' : ''}
         
         Thumbnail Requirements:
-        - EXTREMELY eye-catching, high contrast colors (orange, yellow, pink, purple)
-        - Characters with EXAGGERATED shocked/surprised/funny expressions
-        - Dynamic composition, characters looking at camera
-        - Bold, clean background (gradient or simple environment)
-        - Studio lighting with rim light for pop effect
-        - NO TEXT on the image
-        - 3D render quality, Pixar/Disney style, 8K resolution
+        - EXTREMELY eye-catching, high contrast colors (Pop art style).
+        - Characters with EXAGGERATED shocked/surprised/funny expressions reacting to the story theme.
+        - Dynamic composition, characters looking at camera or reacting to an event.
+        - Bold, clean background related to the Category: ${category}.
+        - Studio lighting with rim light for pop effect.
+        - NO TEXT on the image.
+        - 3D render quality, Pixar/Disney style, 8K resolution.
         
         Aspect Ratio: 9:16 (Vertical, portrait for TikTok/Reels).
         `;
+
+        // Prepare contents
+        const contents: any[] = [{
+            role: 'user',
+            parts: [
+                // Add reference image if provided
+                ...(referenceImage ? [{
+                    inlineData: {
+                        mimeType: 'image/png',
+                        data: referenceImage.split(',')[1] || referenceImage
+                    }
+                }] : []),
+                { text: basePrompt }
+            ]
+        }];
 
         // Try primary model
         try {
             const response = await genAI.models.generateContent({
                 model: 'gemini-3-pro-image-preview',
-                contents: [{ role: 'user', parts: [{ text: basePrompt }] }],
+                contents: contents, // Use updated contents with image support
                 config: {
                     responseModalities: ['image'],
                 }
@@ -72,7 +101,7 @@ export async function POST(request: NextRequest) {
             try {
                 const fallbackResponse = await genAI.models.generateContent({
                     model: 'gemini-2.0-flash-preview-image-generation',
-                    contents: [{ role: 'user', parts: [{ text: basePrompt }] }],
+                    contents: contents, // Use updated contents with reference image
                     config: {
                         responseModalities: ['image', 'text'],
                     }

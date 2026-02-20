@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import React from 'react';
-import { Camera, Sparkles, ArrowRight, Zap, Shield, Clock, Film, Users, Wand2, Mic, Video } from 'lucide-react';
+import { Camera, Sparkles, ArrowRight, Zap, Shield, Clock, Film, Users, Wand2, Mic, Video, Bug } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Logo } from '@/components/ui/Logo';
 import { JsonLd } from '@/components/seo/JsonLd';
@@ -129,6 +129,16 @@ export default function HomePage() {
             >
               <Mic size={18} />
               {t('cta_voice')}
+              <ArrowRight size={16} />
+            </Link>
+
+            {/* 7. POV Studio */}
+            <Link
+              href="/pov-studio"
+              className="btn-secondary text-sm px-8 py-5 flex items-center justify-center gap-3 active:scale-95 w-full bg-[#f97316]/10 hover:bg-[#f97316]/20 border-[#f97316]/30 text-[#f97316]"
+            >
+              <Bug size={18} />
+              {t('pov_studio')}
               <ArrowRight size={16} />
             </Link>
           </nav>

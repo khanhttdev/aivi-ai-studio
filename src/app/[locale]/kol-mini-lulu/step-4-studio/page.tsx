@@ -16,7 +16,10 @@ export default function Step4StudioPage() {
         updateScene,
         customCharacter,
         isGeneratingImages,
-        isGeneratingVideo
+        isGeneratingVideo,
+        miniConfig,
+        luluConfig,
+        productInfo
     } = useKolMiniLuluStore();
 
     // Local state to simulate loading for specific items
@@ -28,13 +31,25 @@ export default function Step4StudioPage() {
 
         setLoadingState(prev => ({ ...prev, [sceneId]: 'image' }));
 
+        // Determine reference image based on scene character
+        let referenceImage = null;
+        if (scene.character === 'mini' && miniConfig.image) {
+            referenceImage = miniConfig.image;
+        } else if (scene.character === 'lulu' && luluConfig.image) {
+            referenceImage = luluConfig.image;
+        } else if (scene.character === 'both') {
+            referenceImage = miniConfig.image || luluConfig.image;
+        }
+
         try {
             const response = await fetch('/api/kol-mini-lulu/generate-image', {
                 method: 'POST',
                 body: JSON.stringify({
                     prompt: scene.action,
                     character: scene.character,
-                    customPrompt: customCharacter?.prompt // Send custom prompt
+                    customPrompt: customCharacter?.prompt, // Send custom prompt
+                    referenceImage: referenceImage, // Send Step 2 generated image as reference,
+                    productImage: productInfo?.enabled ? productInfo.image : undefined // Send product image if enabled
                 })
             });
             const data = await response.json();
@@ -131,36 +146,44 @@ export default function Step4StudioPage() {
                                     className="w-full h-full object-cover"
                                 />
                             ) : (
-                                <div className="absolute inset-0 flex items-center justify-center text-gray-700">
+                                <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-700 gap-4 p-4">
                                     <Clapperboard className="w-12 h-12 opacity-20" />
+                                    <button
+                                        onClick={() => handleGenerateImage(scene.id)}
+                                        disabled={!!loadingState[scene.id]}
+                                        className="w-full py-3 bg-[var(--bg-secondary)] hover:bg-[var(--bg-card)] border border-[var(--border)] rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-all shadow-sm active:scale-95"
+                                    >
+                                        <Wand2 className="w-4 h-4 text-pink-500" />
+                                        <span className="text-[var(--text-primary)]">{t('btn_generate_image')}</span>
+                                    </button>
                                 </div>
                             )}
 
                             {/* Loading Overlay */}
                             {loadingState[scene.id] && (
-                                <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center">
+                                <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-20">
                                     <RefreshCw className="w-8 h-8 text-white animate-spin" />
                                 </div>
                             )}
 
-                            {/* Hover Actions */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-6 gap-3">
-                                <button
-                                    onClick={() => handleGenerateImage(scene.id)}
-                                    disabled={!!loadingState[scene.id]}
-                                    className="w-full py-2 bg-white/10 hover:bg-white/20 backdrop-blur border border-white/20 rounded-lg text-white text-sm font-medium flex items-center justify-center gap-2 transition-all"
-                                >
-                                    <Wand2 className="w-4 h-4" />
-                                    {scene.image_url ? t('btn_regenerate_image') : t('btn_generate_image')}
-                                </button>
+                            {/* Hover Actions (Only show if image exists) */}
+                            {scene.image_url && (
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-6 gap-3 z-10 touch-manipulation">
+                                    <button
+                                        onClick={() => handleGenerateImage(scene.id)}
+                                        disabled={!!loadingState[scene.id]}
+                                        className="w-full py-2 bg-white/10 hover:bg-white/20 backdrop-blur border border-white/20 rounded-lg text-white text-sm font-medium flex items-center justify-center gap-2 transition-all"
+                                    >
+                                        <Wand2 className="w-4 h-4" />
+                                        {t('btn_regenerate_image')}
+                                    </button>
 
-                                {scene.image_url && (
                                     <div className="w-full flex flex-col gap-2">
                                         <div className="flex gap-2">
                                             <button
                                                 onClick={() => handleGenerateVideo(scene.id)}
                                                 disabled={!!loadingState[scene.id]}
-                                                className="flex-1 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg text-white text-sm font-medium flex items-center justify-center gap-2 shadow-lg shadow-purple-500/20"
+                                                className="flex-1 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg text-white text-sm font-medium flex items-center justify-center gap-2 shadow-lg shadow-purple-500/20 active:scale-95 transition-transform"
                                             >
                                                 <Film className="w-4 h-4" />
                                                 {scene.visual_prompt ? t('btn_regenerate_motion') : t('btn_generate_motion')}
@@ -180,7 +203,7 @@ export default function Step4StudioPage() {
 
                                         {/* Motion Prompt Display */}
                                         {scene.visual_prompt && (
-                                            <div className="bg-black/80 p-3 rounded-lg text-xs text-white/90 border border-white/10 break-words relative group">
+                                            <div className="bg-black/80 p-3 rounded-lg text-xs text-white/90 border border-white/10 break-words relative group/prompt">
                                                 <div className="flex justify-between items-center mb-1">
                                                     <p className="font-bold text-[10px] text-purple-400 uppercase">Motion Prompt (Kling/Luma):</p>
                                                     <button
@@ -194,8 +217,8 @@ export default function Step4StudioPage() {
                                             </div>
                                         )}
                                     </div>
-                                )}
-                            </div>
+                                </div>
+                            )}
                         </div>
 
                         {/* Text Preview */}

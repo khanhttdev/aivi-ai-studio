@@ -24,7 +24,10 @@ export default function Step5MarketingKitPage() {
         conceptImageUrl,
         setConceptImageUrl,
         seoData,
-        setSeoData
+        setSeoData,
+        miniConfig,
+        luluConfig,
+        selectedCategory
     } = useKolMiniLuluStore();
 
     const [isGeneratingSeo, setIsGeneratingSeo] = useState(false);
@@ -82,8 +85,6 @@ export default function Step5MarketingKitPage() {
         }
     };
 
-
-
     const handleNewProject = () => {
         reset();
         router.push(`/${locale}/kol-mini-lulu/step-1-concept`);
@@ -119,12 +120,22 @@ export default function Step5MarketingKitPage() {
 
     const generateCover = async () => {
         setIsGeneratingCover(true);
+
+        // Determine reference image based on character
+        let referenceImage = null;
+        if (selectedCharacter === 'mini') referenceImage = miniConfig.image;
+        else if (selectedCharacter === 'lulu') referenceImage = luluConfig.image;
+        else referenceImage = miniConfig.image || luluConfig.image;
+
         try {
             const res = await fetch('/api/kol-mini-lulu/generate-cover', {
                 method: 'POST',
                 body: JSON.stringify({
                     idea: customPrompt,
                     characterPrompt: customCharacter?.prompt || selectedCharacter,
+                    character: selectedCharacter,
+                    category: selectedCategory,
+                    referenceImage: referenceImage,
                     locale
                 })
             });

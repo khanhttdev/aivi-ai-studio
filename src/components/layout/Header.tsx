@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { usePathname } from '@/i18n/routing';
-import { Camera, Settings, Home, LogOut, Menu, X, Wand2, Film, Video, Users, Mic, ChevronDown, Sparkles } from 'lucide-react';
+import { Camera, Settings, Home, LogOut, Menu, X, Wand2, Film, Video, Users, Mic, ChevronDown, Sparkles, Bug } from 'lucide-react';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import { User } from '@supabase/supabase-js';
@@ -40,6 +40,7 @@ export default function Header() {
         { href: '/script-creator', label: t('script_creator'), icon: Wand2 },
         { href: '/voice-studio', label: t('voice_studio'), icon: Mic },
         { href: '/kol-mini-lulu', label: t('mini_lulu'), icon: Sparkles },
+        { href: '/pov-studio', label: t('pov_studio'), icon: Bug },
     ];
 
     // Split nav items: visible (max 5) and overflow (rest)

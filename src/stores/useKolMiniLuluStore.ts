@@ -22,6 +22,16 @@ export const useKolMiniLuluStore = create<MiniLuluState>()(
             miniConfig: { prompt: '' as string, image: null as string | null },
             luluConfig: { prompt: '' as string, image: null as string | null },
             conceptImageUrl: null as string | null,
+
+            // Marketing / Booking
+            productInfo: {
+                enabled: false as boolean,
+                name: '' as string,
+                usp: '' as string,
+                image: null as string | null,
+                type: 'general' as 'general' | 'fashion' // Default to general
+            },
+
             selectedTone: 'funny' as 'funny' | 'emotional' | 'action',
             seoData: null as SeoData | null,
             script: [] as Scene[],
@@ -54,6 +64,8 @@ export const useKolMiniLuluStore = create<MiniLuluState>()(
             setLuluConfig: (config: any) => set((state: any) => ({ luluConfig: { ...state.luluConfig, ...config } })),
 
             setConceptImageUrl: (url: string | null) => set({ conceptImageUrl: url }),
+
+            setProductInfo: (info: any) => set((state: any) => ({ productInfo: { ...state.productInfo, ...info } })),
 
             setSelectedTone: (tone: any) => set({ selectedTone: tone }),
 

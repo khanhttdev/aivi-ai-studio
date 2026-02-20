@@ -26,6 +26,7 @@ export const KOL_MINI_LULU_CONSTANTS = {
   },
 
   // Category-specific template banks
+  // Category-specific template banks
   CATEGORY_TEMPLATES: {
     food: [
       {
@@ -34,9 +35,9 @@ export const KOL_MINI_LULU_CONSTANTS = {
         descKey: 'cooking_fail_desc',
         scenes: [
           { character: 'mini', action: 'wearing chef hat, stirring pot with serious face', dialogue: 'Hôm nay trổ tài làm món Pate thượng hạng!' },
-          { character: 'lulu', action: 'running around with a bag of flour, white powder everywhere', dialogue: 'Em phụ chị với! Bột mì nè!' },
-          { character: 'mini', action: 'covered in flour, angry expression, holding a spoon', dialogue: 'LULU!!! Ra khỏi bếp NGAY!' },
-          { character: 'lulu', action: 'sitting in corner covered in flour, looking guilty but cute', dialogue: 'Em chỉ muốn giúp thôi mà...' }
+          { character: 'mini', action: 'tasting the food, making a disgusted face', dialogue: 'Eo ôi... mặn quá!' },
+          { character: 'mini', action: 'trying to fix it by adding sugar', dialogue: 'Thêm chút đường chắc sẽ ổn...' },
+          { character: 'mini', action: 'sitting next to a burnt pot, looking defeated', dialogue: 'Thôi... gọi đồ về ăn cho lành.' }
         ]
       },
       {
@@ -45,9 +46,9 @@ export const KOL_MINI_LULU_CONSTANTS = {
         descKey: 'food_review_desc',
         scenes: [
           { character: 'mini', action: 'sitting at fancy restaurant table, putting on monocle', dialogue: 'Hôm nay sẽ review nhà hàng 5 sao này!' },
-          { character: 'lulu', action: 'drooling at the menu, eyes sparkling', dialogue: 'Cái gì cũng muốn ăn hết!' },
+          { character: 'mini', action: 'sniffing the food elegantly', dialogue: 'Mùi thơm đấy, nhưng trình bày chưa đạt chuẩn.' },
           { character: 'mini', action: 'tasting food with judgmental face, writing notes', dialogue: 'Hmm... vị này chỉ được 7/10. Thiếu muối.' },
-          { character: 'both', action: 'fighting over the last piece of cake', dialogue: '(Cùng nhau) Miếng cuối cùng là của tui!' }
+          { character: 'mini', action: 'leaving the restaurant with nose high in the air', dialogue: 'Tạm biệt, sẽ không quay lại!' }
         ]
       },
       {
@@ -55,10 +56,10 @@ export const KOL_MINI_LULU_CONSTANTS = {
         titleKey: 'mukbang',
         descKey: 'mukbang_desc',
         scenes: [
-          { character: 'both', action: 'huge table with various dishes, camera setup', dialogue: 'Chào mọi người! Hôm nay ăn sập Sài Gòn!' },
-          { character: 'lulu', action: 'eating extremely fast, face covered in sauce', dialogue: 'Ngon quá trời! *chomp chomp*' },
-          { character: 'mini', action: 'eating gracefully with napkin, disgusted at Lulu', dialogue: 'Ăn từ tốn đi! Mất hình tượng!' },
-          { character: 'lulu', action: 'food coma, lying on back with full belly', dialogue: 'No quá... không thở nổi...' }
+          { character: 'mini', action: 'huge table with various gourmet dishes, camera setup', dialogue: 'Chào mọi người! Hôm nay thưởng thức tiệc hoàng gia!' },
+          { character: 'mini', action: 'eating gracefully with small bites', dialogue: 'Miếng cá hồi này tươi ngon tuyệt vời.' },
+          { character: 'mini', action: 'wiping mouth with napkin elegantly', dialogue: 'Ăn là một nghệ thuật.' },
+          { character: 'mini', action: 'full belly, lying down gracefully', dialogue: 'No quá... cần spa thư giãn ngay.' }
         ]
       }
     ],
@@ -69,9 +70,9 @@ export const KOL_MINI_LULU_CONSTANTS = {
         descKey: 'home_decor_desc',
         scenes: [
           { character: 'mini', action: 'watching interior design video on laptop', dialogue: 'Nhà mình cần makeover theo phong cách tối giản!' },
-          { character: 'lulu', action: 'dragging random objects into living room', dialogue: 'Em có ghế beanbag nè! Và cây cối! Và đèn!' },
-          { character: 'mini', action: 'facepalm with paw, looking at messy room', dialogue: 'Tối giản mà em mang cả chợ về...' },
-          { character: 'both', action: 'sitting proudly in newly decorated room', dialogue: 'Kết quả cũng... ổn phết!' }
+          { character: 'mini', action: 'looking at a pile of clutter with disdain', dialogue: 'Đống lộn xộn này phải biến mất.' },
+          { character: 'mini', action: 'pushing items off the table with paw', dialogue: 'Cái này bỏ, cái kia cũng bỏ.' },
+          { character: 'mini', action: 'sitting proudly in an empty, clean room', dialogue: 'Hoàn hảo. Đây mới là sống!' }
         ]
       },
       {
@@ -79,10 +80,10 @@ export const KOL_MINI_LULU_CONSTANTS = {
         titleKey: 'cleaning_day',
         descKey: 'cleaning_day_desc',
         scenes: [
-          { character: 'mini', action: 'wearing cleaning headband, holding spray bottle', dialogue: 'Hôm nay tổng vệ sinh! Lulu dọn phòng đi!' },
-          { character: 'lulu', action: 'playing with vacuum cleaner like a toy', dialogue: 'Máy hút bụi vui quá ha!' },
-          { character: 'mini', action: 'finding hidden snack stash behind sofa', dialogue: 'Lulu! Đống snack này là sao?!' },
-          { character: 'lulu', action: 'guilty face, hiding behind curtain', dialogue: 'Em... cất dự phòng thôi mà...' }
+          { character: 'mini', action: 'wearing cleaning headband, holding duster', dialogue: 'Hôm nay tổng vệ sinh dinh thự!' },
+          { character: 'mini', action: 'dusting high shelves with serious expression', dialogue: 'Bụi bám ở đây cả trần đời rồi.' },
+          { character: 'mini', action: 'sneezing from dust', dialogue: 'Hắt xì! Bụi quá!' },
+          { character: 'mini', action: 'lying on clean sofa, satisfied', dialogue: 'Sạch sẽ rồi, giờ thì ngủ trưa thôi.' }
         ]
       }
     ],
@@ -92,10 +93,10 @@ export const KOL_MINI_LULU_CONSTANTS = {
         titleKey: 'unboxing',
         descKey: 'unboxing_desc',
         scenes: [
-          { character: 'mini', action: 'sitting next to a large box, camera setup for unboxing', dialogue: 'Hôm nay unbox iPhone 20 Ultra Max Pro!' },
-          { character: 'lulu', action: 'chewing on the box instead of opening it properly', dialogue: 'Để em mở cho! *cắn cắn*' },
-          { character: 'mini', action: 'shocked face looking at destroyed packaging', dialogue: 'LULU! Hộp xấu hết rồi!' },
-          { character: 'mini', action: 'taking perfect product photo with ring light', dialogue: 'Review camera: 10 điểm. Đẹp hơn mặt Lulu.' }
+          { character: 'lulu', action: 'sitting next to a large box, tail wagging excitedly', dialogue: 'Hôm nay unbox đồ chơi công nghệ mới nè!' },
+          { character: 'lulu', action: 'trying to open box with paws clumsily', dialogue: 'Mở ra nào... khó quá đi!' },
+          { character: 'lulu', action: 'tearing the box apart with teeth', dialogue: 'A ha! Ra rồi!' },
+          { character: 'lulu', action: 'wearing the box on head instead of using the product', dialogue: 'Cái hộp này xịn ghê! 10 điểm!' }
         ]
       },
       {
@@ -103,10 +104,10 @@ export const KOL_MINI_LULU_CONSTANTS = {
         titleKey: 'smart_home',
         descKey: 'smart_home_desc',
         scenes: [
-          { character: 'mini', action: 'programming smart home with voice commands', dialogue: 'Alexa, bật đèn! OK Google, mở nhạc!' },
-          { character: 'lulu', action: 'barking at the smart speaker confused', dialogue: 'Ai nói trong cái hộp! Ra đây!' },
-          { character: 'mini', action: 'all devices going haywire, lights flashing', dialogue: 'Lulu! Đừng cắn dây điện!!!' },
-          { character: 'both', action: 'sitting in dark room, power outage', dialogue: '... Thôi quay lại dùng nến vậy.' }
+          { character: 'lulu', action: 'barking at a smart speaker', dialogue: 'Này cái loa kia! Sao mi lại nói tiếng người?' },
+          { character: 'lulu', action: 'accidentally turning on disco lights properly', dialogue: 'Ủa? Sáng quá! Nhảy thôi!' },
+          { character: 'lulu', action: 'chewing on the remote control', dialogue: 'Cái này ngon hơn đồ ăn nữa!' },
+          { character: 'lulu', action: 'smart vacuum chasing Lulu around', dialogue: 'Cứu tôi! Con quái vật này đuổi theo tôi!' }
         ]
       }
     ],
@@ -116,10 +117,10 @@ export const KOL_MINI_LULU_CONSTANTS = {
         titleKey: 'saving_money',
         descKey: 'saving_money_desc',
         scenes: [
-          { character: 'mini', action: 'wearing glasses, spreadsheet on screen', dialogue: 'Từ nay tiết kiệm! Budget 500k/tuần!' },
-          { character: 'lulu', action: 'sneaking to buy treats online', dialogue: 'Bánh xương có sale 50%... mua thôi!' },
-          { character: 'mini', action: 'checking bank app with shocked face', dialogue: 'LULU! Hết tiền rồi! Mới ngày thứ 2!' },
-          { character: 'lulu', action: 'hiding shopping bags behind back', dialogue: 'Nhưng mà... sale mà... đâu có lãng phí...' }
+          { character: 'lulu', action: 'looking at empty piggy bank, sad face', dialogue: 'Heo đất rỗng tuếch rồi...' },
+          { character: 'lulu', action: 'finding a coin under the sofa', dialogue: 'Kho báu! Mình giàu rồi!' },
+          { character: 'lulu', action: 'running to pet shop window', dialogue: 'Mua xương hay mua bóng đây ta?' },
+          { character: 'lulu', action: 'buying everything and looking happy', dialogue: 'Tiền là để tiêu mà! Hahahaha!' }
         ]
       }
     ],
@@ -129,10 +130,10 @@ export const KOL_MINI_LULU_CONSTANTS = {
         titleKey: 'first_trip',
         descKey: 'first_trip_desc',
         scenes: [
-          { character: 'mini', action: 'packing suitcase with organized items', dialogue: 'Đà Lạt! Mang áo ấm, kem chống nắng...' },
-          { character: 'lulu', action: 'stuffing entire toy collection into backpack', dialogue: 'Em mang Mr. Bear và Mrs. Duck và...' },
-          { character: 'both', action: 'sitting on scooter touring the countryside', dialogue: 'Đẹp quá trời! Chụp ảnh đi!' },
-          { character: 'mini', action: 'perfect pose for photo while Lulu photobombs', dialogue: 'LULU! Ra khỏi khung hình!' }
+          { character: 'lulu', action: 'wearing sunglasses and backpack, ready to go', dialogue: 'Đi du lịch thôi! Thế giới ơi ta đến đây!' },
+          { character: 'lulu', action: 'running around in circles excitedly', dialogue: 'Đi đâu trước nhỉ? Công viên hay bãi biển?' },
+          { character: 'lulu', action: 'chasing butterflies in a field', dialogue: 'Bướm ơiii! Đợi em với!' },
+          { character: 'lulu', action: 'sleeping soundly in the backpack, exhausted', dialogue: 'Đi chơi mệt quá... khò khò...' }
         ]
       }
     ],
@@ -143,9 +144,9 @@ export const KOL_MINI_LULU_CONSTANTS = {
         descKey: 'ootd_desc',
         scenes: [
           { character: 'mini', action: 'trying on sunglasses and scarf in mirror', dialogue: 'Hôm nay OOTD style Parisian chic!' },
-          { character: 'lulu', action: 'wearing mismatched clothes proudly', dialogue: 'Em cũng thời trang nè! Áo hoa quần sọc!' },
-          { character: 'mini', action: 'horrified expression looking at Lulu outfit', dialogue: 'Trời ơi... fashion disaster...' },
-          { character: 'both', action: 'walking down street like a runway, mini stylish, lulu goofy', dialogue: '(Narrator) Ai bảo thời trang là phải giống nhau?' }
+          { character: 'mini', action: 'walking like a model on a runway (corridor)', dialogue: 'Thần thái là quan trọng nhất.' },
+          { character: 'mini', action: 'posing for selfie with perfect lighting', dialogue: 'Góc nghiêng thần thánh.' },
+          { character: 'mini', action: 'checking likes on phone, smirking', dialogue: 'Triệu like là chuyện bình thường.' }
         ]
       }
     ],
@@ -155,10 +156,10 @@ export const KOL_MINI_LULU_CONSTANTS = {
         titleKey: 'gym_workout',
         descKey: 'gym_workout_desc',
         scenes: [
-          { character: 'mini', action: 'lying on yoga mat, lifting tiny dumbbells, sweating', dialogue: 'Mục tiêu: Giảm 2 lạng mỡ thừa!' },
-          { character: 'lulu', action: 'biting the yoga mat and pulling it away', dialogue: 'Chơi kéo co đi chị ơi!' },
-          { character: 'mini', action: 'faceplanted on floor, annoyed', dialogue: 'Mất hết cả hứng tập...' },
-          { character: 'both', action: 'sleeping together on the yoga mat', dialogue: '(Cùng nhau) Thôi mai tập tiếp...' }
+          { character: 'mini', action: 'lying on yoga mat, lifting tiny dumbbells', dialogue: 'Mục tiêu: Giảm mỡ bụng, tăng cơ bắp!' },
+          { character: 'mini', action: 'doing a difficult yoga pose flawlessly', dialogue: 'Hít vào... thở ra... thăng bằng.' },
+          { character: 'mini', action: 'drinking detox water elegantly', dialogue: 'Sống healthy thật là tuyệt.' },
+          { character: 'mini', action: 'looking in mirror, flexing non-existent muscles', dialogue: 'Cơ bắp cuồn cuộn rồi đây.' }
         ]
       }
     ],
@@ -168,10 +169,10 @@ export const KOL_MINI_LULU_CONSTANTS = {
         titleKey: 'study_tips',
         descKey: 'study_tips_desc',
         scenes: [
-          { character: 'mini', action: 'wearing reading glasses, surrounded by books', dialogue: 'Bí quyết học giỏi: Tập trung 100%!' },
-          { character: 'lulu', action: 'falling asleep on textbook, drooling', dialogue: 'Zzz... 1+1=... zzz...' },
-          { character: 'mini', action: 'slapping Lulu with ruler (gently)', dialogue: 'Dậy học! Thi tuần sau rồi!' },
-          { character: 'both', action: 'celebrating with A+ test paper', dialogue: 'Chúng ta LÀM ĐƯỢC rồi!!!' }
+          { character: 'lulu', action: 'wearing glasses (upside down), looking at book', dialogue: 'Hôm nay giáo sư Lulu sẽ dạy học!' },
+          { character: 'lulu', action: 'trying to eat the homework', dialogue: 'Kiến thức này... vị hơi giấy...' },
+          { character: 'lulu', action: 'falling asleep on the open book', dialogue: 'Học nhiều quá... buồn ngủ ghê...' },
+          { character: 'lulu', action: 'waking up confused with ink on face', dialogue: 'Ủa? Hết giờ học chưa?' }
         ]
       }
     ],

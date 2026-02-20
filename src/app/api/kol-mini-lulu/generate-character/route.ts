@@ -35,44 +35,51 @@ export async function POST(request: NextRequest) {
         let characterDesc = '';
         if (character === 'mini') {
             characterDesc = `
-            Subject: **Mini** - a specific, iconic Cat character. KEEP IDENTITY EXACTLY.
-            **LOCKED PHYSICAL TRAITS (NEVER CHANGE):**
-            - Breed: British Shorthair. Fur: Light Grey/Silver.
-            - Eyes: Big, round, expressive amber/orange eyes.
-            - Face: Round, chubby cheeks, slightly grumpy/judging expression but cute.
-            - Body: Chubby, fluffy, compact.
+            Subject: **Mini** - The British Shorthair Cat.
+            **LOCKED IDENTITY (MUST MATCH REFERENCE EXACTLY):**
+            - **Face:** Round, chubby cheeks, flat face profile.
+            - **Eyes:** Big, round, expressive amber/orange eyes.
+            - **Fur:** Solid light grey/silver. Plush texture.
+            - **Body:** Chubby, short legs, "cobby" build.
+            - **Expression:** Slightly grumpy/judging but very cute.
             
-            **CHANGE ONLY:**
-            - Outfit/Accessories: ${prompt ? prompt : `Creative outfit fitting the story: "${idea || 'fun adventure'}". Keep it cute and stylish.`}
-            - Pose: Dynamic, expressive pose fitting the story mood.
+            **DYNAMIC ELEMENTS (CHANGE BASED ON CONTEXT):**
+            - **Outfit:** ${prompt ? prompt : `Costume fitting for "${idea}": e.g., Chef hat, Scarf, etc. Keep it cute.`}
+            - **Pose:** Acting out the role (e.g., cooking, traveling).
             `;
         } else if (character === 'lulu') {
             characterDesc = `
-            Subject: **Lulu** - a specific, iconic Dog character. KEEP IDENTITY EXACTLY.
-            **LOCKED PHYSICAL TRAITS (NEVER CHANGE):**
-            - Breed: Golden Retriever. Fur: Golden/Cream, long and wavy, fluffy.
-            - Eyes: Dark, warm, happy eyes. Big happy smile, tongue often out.
-            - Face: Goofy, clumsy, lovable expression.
-            - Body: Big, strong but unaware of his size.
+            Subject: **Lulu** - The Golden Retriever Dog.
+            **LOCKED IDENTITY (MUST MATCH REFERENCE EXACTLY):**
+            - **Face:** Friendly, goofy, wet nose.
+            - **Eyes:** Dark, warm, happy eyes.
+            - **Fur:** Golden/Cream color. Long, wavy, fluffy ears/tail.
+            - **Body:** Big, sturdy, fluffy.
+            - **Expression:** Big happy smile, tongue often lolling out.
             
-            **CHANGE ONLY:**
-            - Outfit/Accessories: ${prompt ? prompt : `Creative outfit fitting the story: "${idea || 'fun adventure'}". Keep it fun and goofy.`}
-            - Pose: Dynamic, expressive pose fitting the story mood.
+            **DYNAMIC ELEMENTS (CHANGE BASED ON CONTEXT):**
+            - **Outfit:** ${prompt ? prompt : `Costume fitting for "${idea}": e.g., Glasses, Bandana, Backpack. Keep it goofy.`}
+            - **Pose:** Energetic, clumsy, acting out the role.
             `;
         }
 
         const finalPrompt = `
-        Create a 3D Pixar/Disney-style character illustration.
+        **TASK:** Create a 3D Pixar/Disney-style character render.
         
-        ⚠️ CRITICAL RULE: The character's face, body shape, and core appearance MUST match the reference image exactly. ONLY change the clothing and accessories.
+        **CRITICAL INSTRUCTION:** 
+        1. Look at the REFERENCE IMAGE provided. You MUST keep the character's Face, Body shape, and Fur color EXACTLY THE SAME as the reference.
+        2. ONLY change the Outfit/Accessories and Pose to match the Story Context.
         
+        **CHARACTER SPECS:**
         ${characterDesc}
         
-        Story Context: "${idea || 'A fun adventure'}"
+        **STORY CONTEXT:** "${idea || 'A fun adventure'}"
         
-        Style: 3D Animation render, Pixar quality, vibrant colors, expressive lighting, clean background with subtle gradient.
-        Format: Vertical 9:16 aspect ratio. Character centered, full body or 3/4 view.
-        Quality: 4K, highly detailed, professional animation studio quality.
+        **STYLE:** 
+        - 3D Animation render.
+        - Pixar quality: Subsurface scattering on fur, expressive lighting.
+        - Vibrant colors, clean background (studio lighting or simple scenic background).
+        - Aspect Ratio: 9:16 (Vertical).
         `;
 
         // Try to load reference image
