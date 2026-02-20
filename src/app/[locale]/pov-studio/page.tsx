@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 import {
     Upload, Zap, Copy, Download, Trash2, Clock, Plus,
     ChevronDown, Skull, Bug, Package, PawPrint, Star, Sparkles,
-    RefreshCw, FileText, History, X, Mic, Image as ImageIcon, Archive, Play, Pause, Volume2
+    RefreshCw, FileText, History, X, Mic, Image as ImageIcon, Archive, Play, Pause, Volume2, AlertTriangle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase/client';
@@ -192,10 +192,10 @@ export default function POVStudioPage() {
     const [playingAudio, setPlayingAudio] = useState<string | number | null>(null);
     const audioRef = useRef<HTMLAudioElement | null>(null);
 
-    // History state
     const [history, setHistory] = useState<POVScriptRecord[]>([]);
     const [isLoadingHistory, setIsLoadingHistory] = useState(false);
     const [showHistory, setShowHistory] = useState(false);
+    const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
     // Load history on mount
     useEffect(() => {
@@ -615,9 +615,8 @@ export default function POVStudioPage() {
         }
     };
 
-    const handleDeleteHistory = async (id: string, e: React.MouseEvent) => {
-        e.stopPropagation();
-        if (!window.confirm(t('confirm_delete'))) return;
+    const handleDeleteHistory = async (id: string, e?: React.MouseEvent) => {
+        if (e) e.stopPropagation();
         try {
             const { error } = await supabase.from('pov_scripts').delete().eq('id', id);
             if (error) throw error;
@@ -625,6 +624,8 @@ export default function POVStudioPage() {
             toast.success(t('deleted'));
         } catch (err) {
             toast.error(t('error_delete'));
+        } finally {
+            setDeleteConfirmId(null);
         }
     };
 
@@ -931,7 +932,10 @@ export default function POVStudioPage() {
                                                             </div>
                                                         </button>
                                                         <button
-                                                            onClick={(e) => handleDeleteHistory(record.id, e)}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setDeleteConfirmId(record.id);
+                                                            }}
                                                             className="p-1.5 text-white/20 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
                                                         >
                                                             <Trash2 size={14} />
@@ -1283,6 +1287,56 @@ export default function POVStudioPage() {
                     </div>
                 </div>
             </section>
+
+            {/* Delete Confirmation Modal */}
+            <AnimatePresence>
+                {deleteConfirmId && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                        <m.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                            onClick={() => setDeleteConfirmId(null)}
+                        />
+                        <m.div
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            className="relative bg-zinc-900 border border-red-500/20 rounded-2xl p-6 w-full max-w-md shadow-2xl overflow-hidden"
+                        >
+                            {/* Glow effect */}
+                            <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-red-500/50 to-transparent" />
+                            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-32 bg-red-500/10 rounded-full blur-3xl" />
+
+                            <div className="relative z-10 flex flex-col items-center text-center">
+                                <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mb-4 border border-red-500/20">
+                                    <AlertTriangle className="text-red-400" size={24} />
+                                </div>
+                                <h3 className="text-xl font-bold text-white mb-2">{t('delete_title')}</h3>
+                                <p className="text-white/60 text-sm mb-6 max-w-[280px]">
+                                    {t('confirm_delete')}
+                                </p>
+                                <div className="flex items-center gap-3 w-full">
+                                    <button
+                                        onClick={() => setDeleteConfirmId(null)}
+                                        className="flex-1 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white text-sm font-semibold transition-colors"
+                                    >
+                                        {t('btn_cancel')}
+                                    </button>
+                                    <button
+                                        onClick={() => handleDeleteHistory(deleteConfirmId)}
+                                        className="flex-1 px-4 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white text-sm font-semibold transition-colors flex items-center justify-center gap-2"
+                                    >
+                                        <Trash2 size={16} />
+                                        {t('btn_delete')}
+                                    </button>
+                                </div>
+                            </div>
+                        </m.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }
