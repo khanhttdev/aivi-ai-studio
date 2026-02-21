@@ -92,7 +92,7 @@ export default function Header() {
     const handleLogout = async () => {
         await supabase.auth.signOut();
         router.refresh();
-        router.push('/login');
+        router.push('/');
     };
 
     return (
