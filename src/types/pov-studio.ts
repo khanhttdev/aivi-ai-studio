@@ -56,6 +56,25 @@ export interface POVScriptRecord {
     script_data: POVScene[];
     hook: POVSection | null;
     cta: POVSection | null;
+    current_step: number;
     created_at: string;
     updated_at: string;
+}
+
+export interface POVMarketingData {
+    title: string;
+    description: string;
+    hashtags: string[];
+    keywords: string[];
+    viralHooks: string[];
+    socialPosts: {
+        threads: string;
+        instagram: string;
+        facebook: string;
+    };
+    targetAudience: {
+        demographics: string;
+        painPoints: string[];
+        desires: string[];
+    };
 }

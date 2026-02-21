@@ -15,6 +15,60 @@
         "try_again": "Thử lại",
         "go_home": "Về trang chủ"
     },
+    "CreatorHub": {
+        "title": "AI Creator Hub",
+        "subtitle": "Trung tâm Sáng tạo Trí tuệ Nhân tạo",
+        "description": "Tập hợp các công cụ AI mạnh mẽ để giải phóng sức sáng tạo của bạn.",
+        "categories": {
+            "all": "Tất cả",
+            "video_production": "Sản xuất Video",
+            "content_writing": "Viết Nội dung",
+            "asset_generation": "Tạo Tài nguyên",
+            "analysis": "Phân tích"
+        },
+        "tools": {
+            "image_studio": {
+                "title": "Image Studio",
+                "desc": "Tạo hình ảnh chất lượng cao",
+                "badge": "MỚI"
+            },
+            "story_studio": {
+                "title": "Story Studio",
+                "desc": "Tạo kịch bản và storyboard",
+                "badge": ""
+            },
+            "kol_studio": {
+                "title": "KOL Studio",
+                "desc": "Theo dõi và quản lý KOL",
+                "badge": ""
+            },
+            "mini_lulu": {
+                "title": "Mimi & Lulu",
+                "desc": "Nhân vật 3D tương tác",
+                "badge": "HOT"
+            },
+            "video_analyzer": {
+                "title": "Video Analyzer",
+                "desc": "Phân tích chỉ số viral video",
+                "badge": ""
+            },
+            "script_creator": {
+                "title": "Script Creator",
+                "desc": "Trợ lý nội dung đa nền tảng",
+                "badge": ""
+            },
+            "pov_studio": {
+                "title": "POV Studio",
+                "desc": "Kịch bản POV sáng tạo",
+                "badge": "MỚI"
+            },
+            "voice_studio": {
+                "title": "Voice Studio",
+                "desc": "Tạo giọng đọc AI AI",
+                "badge": ""
+            }
+        }
+    },
     "Tour": {
         "step1_title": "Bắt đầu câu chuyện mới",
         "step1_desc": "Nhấn vào đây để khởi tạo một dự án Story Studio mới.",
@@ -40,6 +94,7 @@
         "twitter_description": "Sáng tạo nội dung không giới hạn."
     },
     "Navigation": {
+        "creator_hub": "AI Creator Hub",
         "menu": "Danh mục",
         "dashboard": "Tổng quan",
         "story_studio": "Story Studio",
@@ -893,13 +948,32 @@
         }
     },
     "POVStudio": {
-        "badge": "POV Script Studio • AI Powered",
-        "title_line1": "Tạo Kịch Bản",
-        "title_line2": "POV Viral",
-        "subtitle": "Tạo kịch bản TikTok theo góc nhìn của quái vật/vi khuẩn bị sản phẩm tiêu diệt. Viral ngay từ cảnh đầu tiên!",
-        "stat_pov_types": "Loại POV",
-        "stat_powered": "Gemini AI",
-        "stat_scripts": "Kịch bản",
+        "studio_title": "POV Creator Studio",
+        "studio_subtitle": "Phòng thu kịch bản POV chuyên nghiệp",
+        "Hero": {
+            "badge": "POV Script Studio • AI Powered",
+            "title_line1": "Tạo Kịch Bản",
+            "title_line2": "POV Viral",
+            "subtitle": "Tạo kịch bản TikTok theo góc nhìn của quái vật/vi khuẩn bị sản phẩm tiêu diệt. Viral ngay từ cảnh đầu tiên!",
+            "cta_create": "Bắt đầu ngay",
+            "cta_explore": "Khám phá mẫu",
+            "stat_pov_types": "Loại POV",
+            "stat_powered": "Gemini AI",
+            "stat_scripts": "Kịch bản"
+        },
+        "Dashboard": {
+            "title": "Quản lý dự án",
+            "subtitle": "Xem lại các video POV bạn đã tạo hoặc bắt đầu một kịch bản mới.",
+            "btn_new": "Tạo dự án mới",
+            "search_placeholder": "Tìm kiếm dự án...",
+            "projects_count": "Dự án",
+            "generating_thumbnail": "Đang tạo ảnh bìa...",
+            "untitled": "Dự án không tên",
+            "btn_delete": "Xóa dự án",
+            "delete_title": "Xóa dự án?",
+            "delete_confirm": "Dự án này sẽ bị xóa vĩnh viễn và không thể khôi phục.",
+            "btn_continue": "Tiếp tục"
+        },
         "section_pov_type": "Chọn Loại POV",
         "section_pov_type_desc": "Nhân vật phản diện trong video của bạn là gì?",
         "pov_bacteria": "Vi Khuẩn",
@@ -983,6 +1057,54 @@
         "success_zip": "Đã tải bộ kit!",
         "error_zip": "Lỗi xuất file",
         "scene_assets": "Tài Nguyên Cảnh Quay",
-        "no_assets_yet": "Tạo giọng nói hoặc hình ảnh cho từng cảnh ở trên"
+        "no_assets_yet": "Tạo giọng nói hoặc hình ảnh cho từng cảnh ở trên",
+        "step_1_title": "Khởi Tạo",
+        "step_1_desc": "Cấu hình nhân vật POV và sản phẩm",
+        "step_2_title": "Kịch Bản",
+        "step_2_desc": "Tạo và xem lại kịch bản viral",
+        "step_3_title": "Storyboard",
+        "step_3_desc": "Tạo giọng nói và hình ảnh cảnh quay",
+        "step_4_title": "Marketing Kit",
+        "step_4_desc": "Tạo nội dung SEO và ảnh bìa",
+        "btn_next_step": "Tiếp Tục",
+        "btn_prev_step": "Quay Lại",
+        "btn_generate_script": "Tạo Kịch Bản",
+        "btn_go_to_storyboard": "Đến Storyboard",
+        "btn_go_to_marketing": "Đến Marketing Kit",
+        "mk_title": "Marketing Kit",
+        "mk_subtitle": "Nội dung SEO và ảnh bìa được tạo bởi AI cho video TikTok viral",
+        "mk_thumbnail_title": "Ảnh Bìa Video",
+        "mk_designing_thumbnail": "Đang thiết kế ảnh bìa...",
+        "mk_btn_generate_cover": "Tạo Ảnh Bìa",
+        "mk_btn_regenerate_cover": "Tạo Lại",
+        "mk_btn_download_raw": "Tải Ảnh",
+        "mk_seo_title": "Nội Dung SEO",
+        "mk_btn_generate_seo": "Tạo SEO",
+        "mk_btn_rewrite": "Viết Lại",
+        "mk_viral_title": "Tiêu Đề Viral",
+        "mk_caption": "Mô Tả / Caption",
+        "mk_hashtags": "Hashtags",
+        "mk_keywords": "Từ Khoá",
+        "mk_copy_title": "Đã sao chép tiêu đề!",
+        "mk_copy_desc": "Đã sao chép mô tả!",
+        "mk_copy_all": "Đã sao chép toàn bộ!",
+        "mk_btn_copy_all": "Sao Chép Tất Cả",
+        "mk_empty_seo_title": "Sẵn Sàng",
+        "mk_empty_seo_desc": "Nhấn 'Tạo SEO' để tạo nội dung marketing viral cho video",
+        "btn_back": "Quay Lại",
+        "mk_toast_seo_success": "Đã tạo nội dung SEO!",
+        "mk_toast_seo_error": "Lỗi tạo nội dung SEO",
+        "mk_toast_cover_success": "Đã tạo ảnh bìa!",
+        "mk_toast_cover_error": "Lỗi tạo ảnh bìa",
+        "mk_btn_new_script": "Tạo Mới",
+        "mk_btn_download_zip": "Tải Marketing Kit (.ZIP)",
+        "mk_viral_hooks": "Viral Hooks (3s đầu)",
+        "mk_social_posts": "Bài Đăng Mạng Xã Hội",
+        "mk_target_audience": "Tệp Khách Hàng",
+        "mk_demographics": "Nhân khẩu học",
+        "mk_pain_points": "Nỗi đau",
+        "mk_desires": "Mong muốn",
+        "mk_btn_generate_seo_now": "Tạo SEO Ngay",
+        "btn_start_over": "Bắt Đầu Lại"
     }
 }

@@ -233,39 +233,51 @@ export interface Database {
                     user_id: string
                     title: string
                     pov_type: string
-                    product_name: string
-                    monster_description: string
+                    product_name: string | null
+                    monster_description: string | null
                     scene_count: number
+                    product_image_url: string | null
+                    monster_image_url: string | null
                     script_data: Json
-                    hook: string
-                    cta: string
+                    hook: Json | null
+                    cta: Json | null
+                    current_step: number
                     created_at: string
+                    updated_at: string
                 }
                 Insert: {
                     id?: string
                     user_id: string
                     title: string
                     pov_type: string
-                    product_name: string
-                    monster_description: string
+                    product_name?: string | null
+                    monster_description?: string | null
                     scene_count: number
+                    product_image_url?: string | null
+                    monster_image_url?: string | null
                     script_data: Json
-                    hook: string
-                    cta: string
+                    hook?: Json | null
+                    cta?: Json | null
+                    current_step?: number
                     created_at?: string
+                    updated_at?: string
                 }
                 Update: {
                     id?: string
                     user_id?: string
                     title?: string
                     pov_type?: string
-                    product_name?: string
-                    monster_description?: string
+                    product_name?: string | null
+                    monster_description?: string | null
                     scene_count?: number
+                    product_image_url?: string | null
+                    monster_image_url?: string | null
                     script_data?: Json
-                    hook?: string
-                    cta?: string
+                    hook?: Json | null
+                    cta?: Json | null
+                    current_step?: number
                     created_at?: string
+                    updated_at?: string
                 }
             }
         }

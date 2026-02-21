@@ -15,6 +15,60 @@
         "try_again": "Try Again",
         "go_home": "Go Home"
     },
+    "CreatorHub": {
+        "title": "AI Creator Hub",
+        "subtitle": "Artificial Intelligence Creative Center",
+        "description": "A collection of powerful AI tools to unleash your creativity.",
+        "categories": {
+            "all": "All",
+            "video_production": "Video Production",
+            "content_writing": "Content Writing",
+            "asset_generation": "Asset Generation",
+            "analysis": "Analysis"
+        },
+        "tools": {
+            "image_studio": {
+                "title": "Image Studio",
+                "desc": "Generate high-quality images",
+                "badge": "NEW"
+            },
+            "story_studio": {
+                "title": "Story Studio",
+                "desc": "Create scripts and storyboards",
+                "badge": ""
+            },
+            "kol_studio": {
+                "title": "KOL Studio",
+                "desc": "Track and manage KOLs",
+                "badge": ""
+            },
+            "mini_lulu": {
+                "title": "Mimi & Lulu",
+                "desc": "Interactive 3D Characters",
+                "badge": "HOT"
+            },
+            "video_analyzer": {
+                "title": "Video Analyzer",
+                "desc": "Analyze viral video metrics",
+                "badge": ""
+            },
+            "script_creator": {
+                "title": "Script Creator",
+                "desc": "Cross-platform content assistant",
+                "badge": ""
+            },
+            "pov_studio": {
+                "title": "POV Studio",
+                "desc": "Creative POV Scripts",
+                "badge": "NEW"
+            },
+            "voice_studio": {
+                "title": "Voice Studio",
+                "desc": "Generate AI Voices",
+                "badge": ""
+            }
+        }
+    },
     "Tour": {
         "step1_title": "Start New Story",
         "step1_desc": "Click here to initialize a new Story Studio project.",
@@ -40,6 +94,7 @@
         "twitter_description": "Unlimited content creation."
     },
     "Navigation": {
+        "creator_hub": "AI Creator Hub",
         "menu": "Menu",
         "dashboard": "Dashboard",
         "story_studio": "Story Studio",
@@ -867,6 +922,32 @@
         }
     },
     "POVStudio": {
+        "studio_title": "POV Creator Studio",
+        "studio_subtitle": "Professional POV script studio",
+        "Hero": {
+            "badge": "POV Script Studio • AI Powered",
+            "title_line1": "Create Viral",
+            "title_line2": "POV Script",
+            "subtitle": "Create TikTok scripts from the perspective of monsters/bacteria being defeated by your product. Viral from the first frame!",
+            "cta_create": "Start Creating",
+            "cta_explore": "Explore Templates",
+            "stat_pov_types": "POV Types",
+            "stat_powered": "Gemini AI",
+            "stat_scripts": "Scripts"
+        },
+        "Dashboard": {
+            "title": "Project Management",
+            "subtitle": "Review your POV videos or start a new script from scratch.",
+            "btn_new": "New POV Project",
+            "search_placeholder": "Search projects...",
+            "projects_count": "Projects",
+            "generating_thumbnail": "Generating cover...",
+            "untitled": "Untitled Project",
+            "btn_delete": "Delete project",
+            "delete_title": "Delete Project?",
+            "delete_confirm": "This project will be permanently deleted and cannot be recovered.",
+            "btn_continue": "Continue"
+        },
         "badge": "POV Script Studio • AI Powered",
         "title_line1": "Create Viral",
         "title_line2": "POV Scripts",
@@ -957,6 +1038,54 @@
         "success_zip": "Export kit downloaded!",
         "error_zip": "Export failed",
         "scene_assets": "Scene Assets",
-        "no_assets_yet": "Generate voice or image for scenes above"
+        "no_assets_yet": "Generate voice or image for scenes above",
+        "step_1_title": "Setup",
+        "step_1_desc": "Configure your POV character and product",
+        "step_2_title": "Script",
+        "step_2_desc": "Generate and review your viral script",
+        "step_3_title": "Storyboard",
+        "step_3_desc": "Create voiceover and scene visuals",
+        "step_4_title": "Marketing Kit",
+        "step_4_desc": "Generate SEO content and thumbnail",
+        "btn_next_step": "Next Step",
+        "btn_prev_step": "Back",
+        "btn_back": "Back",
+        "btn_generate_script": "Generate Script",
+        "btn_go_to_storyboard": "Go to Storyboard",
+        "btn_go_to_marketing": "Go to Marketing Kit",
+        "mk_title": "Marketing Kit",
+        "mk_subtitle": "AI-generated SEO content and thumbnail for your viral TikTok video",
+        "mk_thumbnail_title": "Video Thumbnail",
+        "mk_designing_thumbnail": "Designing thumbnail...",
+        "mk_btn_generate_cover": "Generate Thumbnail",
+        "mk_btn_regenerate_cover": "Regenerate",
+        "mk_btn_download_raw": "Download Image",
+        "mk_seo_title": "SEO Content",
+        "mk_btn_generate_seo": "Generate SEO",
+        "mk_btn_rewrite": "Rewrite",
+        "mk_viral_title": "Viral Title",
+        "mk_caption": "Caption / Description",
+        "mk_hashtags": "Hashtags",
+        "mk_keywords": "Keywords",
+        "mk_copy_title": "Title copied!",
+        "mk_copy_desc": "Description copied!",
+        "mk_copy_all": "All content copied!",
+        "mk_btn_copy_all": "Copy All",
+        "mk_empty_seo_title": "Ready to Generate",
+        "mk_empty_seo_desc": "Click 'Generate SEO' to create viral marketing content for your video",
+        "mk_toast_seo_success": "SEO content generated!",
+        "mk_toast_seo_error": "Failed to generate SEO content",
+        "mk_toast_cover_success": "Thumbnail generated!",
+        "mk_toast_cover_error": "Error generating cover",
+        "mk_btn_new_script": "Create New",
+        "mk_btn_download_zip": "Download Marketing Kit (.ZIP)",
+        "mk_viral_hooks": "Viral Hooks (First 3s)",
+        "mk_social_posts": "Social Media Posts",
+        "mk_target_audience": "Target Audience",
+        "mk_demographics": "Demographics",
+        "mk_pain_points": "Pain Points",
+        "mk_desires": "Desires",
+        "mk_btn_generate_seo_now": "Generate SEO Now",
+        "btn_start_over": "Start Over"
     }
 }

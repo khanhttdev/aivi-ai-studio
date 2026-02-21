@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { usePathname } from '@/i18n/routing';
-import { Camera, Settings, Home, LogOut, Menu, X, Wand2, Film, Video, Users, Mic, ChevronDown, Sparkles, Bug } from 'lucide-react';
+import { Camera, Settings, Home, LogOut, Menu, X, Wand2, Film, Video, Users, Mic, ChevronDown, Sparkles, Bug, Layers } from 'lucide-react';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import { User } from '@supabase/supabase-js';
@@ -32,7 +32,6 @@ export default function Header() {
     const { avatarUrl, displayName } = useSettingsStore();
 
     const navItems = [
-        { href: '/', label: t('home'), icon: Home },
         { href: '/kol-studio', label: t('kol_studio'), icon: Users },
         { href: '/story-studio', label: t('story_studio'), icon: Film },
         { href: '/video-analyzer', label: t('video_analyzer'), icon: Video },
