@@ -2,6 +2,19 @@
 
 Tất cả các thay đổi đáng chú ý đối với dự án Mimi & Lulu sẽ được ghi lại trong tệp này.
 
+## [0.2.2] - 2026-02-21
+
+### ✨ Tính năng mới
+- **Trạm Sáng Tạo AI**: Tích hợp toàn bộ 8 công cụ (Creator Hub) vào Trang chủ (Hero Section) sử dụng thiết kế Bento Box trực quan, loại bỏ các mục menu thừa.
+- **Marketing Kit Mở Rộng (POV Studio)**: SEO Data trả về phong phú hơn: e.g. Viral Hooks (3s đầu), Bài Đăng (X/Insta/FB), Target Audience (Nhân khẩu học, Nỗi đau, Mong muốn), cùng các thẻ Hashtags & Từ Khóa dạng Badge.
+
+### 🐛 Vá lỗi & Cải thiện (Audit Fixes)
+- **Accessibility (a11y)**: Bổ sung `aria-label` cho các nút điều hướng và icon chức năng trong Mini-Lulu & POV Studio.
+- **i18n Hoàn thiện (POV Studio)**: Khắc phục lỗi hardcode text (Start Over, Generate SEO Now, Download ZIP).
+- **Security Audit**: Fix các lỗ hổng Dependencies thông qua lệnh `npm audit fix`.
+
+---
+
 ## [0.2.1] - 2026-02-18
 
 ### 🐛 Vá lỗi & Cải thiện (Audit Fixes)
